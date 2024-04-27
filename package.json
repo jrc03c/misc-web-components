@@ -1,5 +1,5 @@
 {
-  "name": "@jrc03c/misc-vue-components",
+  "name": "@jrc03c/misc-web-components",
   "version": "0.0.11",
   "main": "src/index.js",
   "dependencies": {
@@ -15,8 +15,8 @@
     "vue": "^3.4.19"
   },
   "scripts": {
-    "build": "esbuild src/index.js --bundle --outfile=dist/misc-vue-components.js",
-    "watch": "esbuild src/index.js --bundle --outfile=dist/misc-vue-components.js --watch",
+    "build": "esbuild src/index.js --bundle --outfile=dist/misc-web-components.js",
+    "watch": "esbuild src/index.js --bundle --outfile=dist/misc-web-components.js --watch",
     "pub": "npm version patch --force && npm publish --access=public"
   }
 }

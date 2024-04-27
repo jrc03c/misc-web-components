@@ -5,7 +5,7 @@ This library contains a few Vue components I've found to be useful in various pr
 # Installation
 
 ```bash
-npm install --save @jrc03c/misc-vue-components
+npm install --save @jrc03c/misc-web-components
 ```
 
 # Usage
@@ -15,7 +15,7 @@ npm install --save @jrc03c/misc-vue-components
 **With bundlers:**
 
 ```js
-const { Draggable, Framee, Resizeable } = require("@jrc03c/misc-vue-components")
+const { Draggable, Framee, Resizeable } = require("@jrc03c/misc-web-components")
 ```
 
 **Without bundlers:**
@@ -23,7 +23,7 @@ const { Draggable, Framee, Resizeable } = require("@jrc03c/misc-vue-components")
 Add the script to your HTML:
 
 ```html
-<script src="path/to/dist/misc-vue-components.js"></script>
+<script src="path/to/dist/misc-web-components.js"></script>
 ```
 
 And then in your JS:
