@@ -5,6 +5,5 @@
   "semi": false,
   "singleQuote": false,
   "tabWidth": 2,
-  "useTabs": false,
-  "vueIndentScriptAndStyle": true
+  "useTabs": false
 }

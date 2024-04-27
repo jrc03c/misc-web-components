@@ -1,6 +1,6 @@
 # Intro
 
-This library contains a few Vue components I've found to be useful in various projects.
+This library contains a few web components I've found to be useful in various projects.
 
 # Installation
 
@@ -32,18 +32,11 @@ And then in your JS:
 const { Draggable, Frame, Resizeable } = MiscWebComponents
 ```
 
-## Add to a Vue app or component
+## Add to a page
 
 ```js
-const MyComponent = {
-  name: "x-my-component",
-
-  components: {
-    "x-draggable": Draggable,
-    "x-frame": Frame,
-    "x-resizeable": Resizeable,
-  },
-}
+const draggable = document.createElement("x-draggable")
+document.body.appendChild(draggable)
 ```
 
 # API

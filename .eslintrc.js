@@ -4,11 +4,9 @@ module.exports = {
     commonjs: true,
     es2021: true,
   },
-  extends: ["eslint:recommended", "plugin:vue/vue3-essential"],
+  extends: ["eslint:recommended"],
   globals: {
-    createVueComponentWithCSS: "readonly",
     MiscWebComponents: "writable",
-    Vue: "readonly",
   },
   overrides: [
     {
@@ -24,6 +22,6 @@ module.exports = {
   parserOptions: {
     ecmaVersion: "latest",
   },
-  plugins: ["eslint-plugin-html", "vue"],
+  plugins: ["eslint-plugin-html"],
   rules: {},
 }
