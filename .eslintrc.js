@@ -7,7 +7,7 @@ module.exports = {
   extends: ["eslint:recommended", "plugin:vue/vue3-essential"],
   globals: {
     createVueComponentWithCSS: "readonly",
-    MiscVueComponents: "writable",
+    MiscWebComponents: "writable",
     Vue: "readonly",
   },
   overrides: [

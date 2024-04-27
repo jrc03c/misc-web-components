@@ -29,7 +29,7 @@ Add the script to your HTML:
 And then in your JS:
 
 ```js
-const { Draggable, Frame, Resizeable } = MiscVueComponents
+const { Draggable, Frame, Resizeable } = MiscWebComponents
 ```
 
 ## Add to a Vue app or component

@@ -1,71 +1,79 @@
-(() => {
-  var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  };
+;(() => {
+  var __getOwnPropNames = Object.getOwnPropertyNames
+  var __commonJS = (cb, mod) =>
+    function __require() {
+      return (
+        mod ||
+          (0, cb[__getOwnPropNames(cb)[0]])(
+            (mod = { exports: {} }).exports,
+            mod,
+          ),
+        mod.exports
+      )
+    }
 
   // node_modules/@jrc03c/vue-component-with-css/src/index.js
   var require_src = __commonJS({
-    "node_modules/@jrc03c/vue-component-with-css/src/index.js"(exports, module) {
+    "node_modules/@jrc03c/vue-component-with-css/src/index.js"(
+      exports,
+      module,
+    ) {
       function createVueComponentWithCSS(component) {
-        let count = 0;
-        let styleElement;
-        component = component || {};
-        const data = component.data ? component.data : function() {
-        };
-        const mounted = component.mounted ? component.mounted : function() {
-        };
-        const unmounted = component.unmounted ? component.unmounted : function() {
-        };
-        if (!data.css)
-          data.css = "";
-        component.data = function() {
-          return data.bind(this)();
-        };
-        component.mounted = function() {
-          mounted.bind(this)();
-          count++;
-          let root = this.$root.$el.getRootNode();
+        let count = 0
+        let styleElement
+        component = component || {}
+        const data = component.data ? component.data : function () {}
+        const mounted = component.mounted ? component.mounted : function () {}
+        const unmounted = component.unmounted
+          ? component.unmounted
+          : function () {}
+        if (!data.css) data.css = ""
+        component.data = function () {
+          return data.bind(this)()
+        }
+        component.mounted = function () {
+          mounted.bind(this)()
+          count++
+          let root = this.$root.$el.getRootNode()
           if (root === document) {
-            root = root.body;
+            root = root.body
           }
           if (!styleElement) {
-            styleElement = document.createElement("style");
-            root.appendChild(styleElement);
-            styleElement.innerHTML = this.css;
+            styleElement = document.createElement("style")
+            root.appendChild(styleElement)
+            styleElement.innerHTML = this.css
           }
-        };
-        component.unmounted = function() {
-          unmounted.bind(this)();
-          count--;
-          let root = this.$root.$el.getRootNode();
+        }
+        component.unmounted = function () {
+          unmounted.bind(this)()
+          count--
+          let root = this.$root.$el.getRootNode()
           if (root === document) {
-            root = root.body;
+            root = root.body
           }
           if (count < 1) {
             if (styleElement) {
               try {
-                root.removeChild(styleElement);
+                root.removeChild(styleElement)
               } catch (e) {
                 try {
-                  styleElement.parentElement.removeChild(styleElement);
-                } catch (e2) {
-                }
+                  styleElement.parentElement.removeChild(styleElement)
+                } catch (e2) {}
               }
             }
-            styleElement = null;
+            styleElement = null
           }
-        };
-        return component;
+        }
+        return component
       }
       if (typeof module !== "undefined") {
-        module.exports = createVueComponentWithCSS;
+        module.exports = createVueComponentWithCSS
       }
       if (typeof window !== "undefined") {
-        window.createVueComponentWithCSS = createVueComponentWithCSS;
+        window.createVueComponentWithCSS = createVueComponentWithCSS
       }
-    }
-  });
+    },
+  })
 
   // node_modules/@jrc03c/pause/index.js
   var require_pause = __commonJS({
@@ -73,25 +81,25 @@
       function pause(ms) {
         return new Promise((resolve, reject) => {
           try {
-            return setTimeout(() => resolve(), ms);
+            return setTimeout(() => resolve(), ms)
           } catch (e) {
-            return reject(e);
+            return reject(e)
           }
-        });
+        })
       }
       if (typeof module !== "undefined") {
-        module.exports = pause;
+        module.exports = pause
       }
       if (typeof window !== "undefined") {
-        window.pause = pause;
+        window.pause = pause
       }
-    }
-  });
+    },
+  })
 
   // src/context-menu/index.js
   var require_context_menu = __commonJS({
     "src/context-menu/index.js"(exports, module) {
-      var css = (
+      var css =
         /* css */
         `
   .x-context-menu {
@@ -155,8 +163,7 @@
     content: "\u276F";
   }
 `
-      );
-      var template = (
+      var template =
         /* html */
         `
   <div
@@ -195,9 +202,8 @@
     </x-context-menu>
   </div>
 `
-      );
-      var createVueComponentWithCSS = require_src();
-      var pause = require_pause();
+      var createVueComponentWithCSS = require_src()
+      var pause = require_pause()
       module.exports = createVueComponentWithCSS({
         name: "x-context-menu",
         template,
@@ -206,7 +212,7 @@
           "is-visible": {
             type: Boolean,
             required: true,
-            default: () => false
+            default: () => false,
           },
           // `items` should be an array of objects, where each object has these
           // properties:
@@ -216,18 +222,18 @@
           items: {
             type: Array,
             required: true,
-            default: () => []
+            default: () => [],
           },
           x: {
             type: Number,
             required: true,
-            default: () => 0
+            default: () => 0,
           },
           y: {
             type: Number,
             required: true,
-            default: () => 0
-          }
+            default: () => 0,
+          },
         },
         data() {
           return {
@@ -236,150 +242,155 @@
             hoveredItemWithChildren: null,
             hoveredItemWithChildrenX: 0,
             hoveredItemWithChildrenY: 0,
-            listenersHaveBeenAdded: false
-          };
+            listenersHaveBeenAdded: false,
+          }
         },
         computed: {
           isRoot() {
-            return this.getRootContextMenu() === this.$el;
-          }
+            return this.getRootContextMenu() === this.$el
+          },
         },
         watch: {
           isVisible() {
             if (this.isVisible) {
-              this.$emit("open");
+              this.$emit("open")
             } else {
-              this.$emit("close");
-              this.hoveredItemWithChildren = null;
-              this.hoveredItemWithChildrenX = 0;
-              this.hoveredItemWithChildrenY = 0;
+              this.$emit("close")
+              this.hoveredItemWithChildren = null
+              this.hoveredItemWithChildrenX = 0
+              this.hoveredItemWithChildrenY = 0
             }
           },
           x() {
-            this.updateComputedStyle();
+            this.updateComputedStyle()
           },
           y() {
-            this.updateComputedStyle();
-          }
+            this.updateComputedStyle()
+          },
         },
         methods: {
           addListeners() {
             if (this.isRoot && !this.listenersHaveBeenAdded) {
-              window.addEventListener("click", this.onClick);
-              window.addEventListener("keydown", this.onKeyDown);
-              this.listenersHaveBeenAdded = true;
+              window.addEventListener("click", this.onClick)
+              window.addEventListener("keydown", this.onKeyDown)
+              this.listenersHaveBeenAdded = true
             }
           },
           getParentContextMenu() {
-            let current = this.$el;
+            let current = this.$el
             while (current.parentElement) {
               if (current.parentElement.classList.contains("x-context-menu")) {
-                return current.parentElement;
+                return current.parentElement
               }
-              current = current.parentElement;
+              current = current.parentElement
             }
-            return this.$el;
+            return this.$el
           },
           getRootContextMenu() {
-            let current = this.$el;
-            let root = this.$el;
+            let current = this.$el
+            let root = this.$el
             while (current.parentElement) {
               if (current.parentElement.classList.contains("x-context-menu")) {
-                root = current.parentElement;
+                root = current.parentElement
               }
-              current = current.parentElement;
+              current = current.parentElement
             }
-            return root;
+            return root
           },
           onClick() {
-            this.$emit("cancel");
+            this.$emit("cancel")
           },
           onKeyDown(event) {
             if (event.key === "Escape") {
-              this.$emit("cancel");
+              this.$emit("cancel")
             }
           },
           removeListeners() {
             if (this.listenersHaveBeenAdded) {
-              window.removeEventListener("click", this.onClick);
-              window.removeEventListener("keydown", this.onKeyDown);
-              this.listenersHaveBeenAdded = false;
+              window.removeEventListener("click", this.onClick)
+              window.removeEventListener("keydown", this.onKeyDown)
+              this.listenersHaveBeenAdded = false
             }
           },
           select(item) {
             if (item.children) {
-              return;
+              return
             }
             if (item.action) {
-              item.action();
+              item.action()
             }
-            this.$emit("select", item);
+            this.$emit("select", item)
           },
           showChildren(event, item) {
-            this.hoveredItemWithChildren = null;
-            this.hoveredItemWithChildrenX = 0;
-            this.hoveredItemWithChildrenY = 0;
+            this.hoveredItemWithChildren = null
+            this.hoveredItemWithChildrenX = 0
+            this.hoveredItemWithChildrenY = 0
             if (item.children) {
               this.$nextTick(() => {
-                const rect = this.$refs.itemsContainer.getBoundingClientRect();
-                const targetRect = event.target.getBoundingClientRect();
-                this.hoveredItemWithChildren = item;
-                this.hoveredItemWithChildrenX = rect.x + rect.width;
-                this.hoveredItemWithChildrenY = rect.y + targetRect.y - rect.y;
-              });
+                const rect = this.$refs.itemsContainer.getBoundingClientRect()
+                const targetRect = event.target.getBoundingClientRect()
+                this.hoveredItemWithChildren = item
+                this.hoveredItemWithChildrenX = rect.x + rect.width
+                this.hoveredItemWithChildrenY = rect.y + targetRect.y - rect.y
+              })
             }
           },
           async updateComputedStyle(shouldCallAgain) {
             if (typeof shouldCallAgain === "undefined") {
-              shouldCallAgain = true;
+              shouldCallAgain = true
             }
             while (!this.$refs.itemsContainer) {
-              await pause(10);
+              await pause(10)
             }
-            let x = this.x;
-            let y = this.y;
-            const itemsRect = this.$refs.itemsContainer.getBoundingClientRect();
+            let x = this.x
+            let y = this.y
+            const itemsRect = this.$refs.itemsContainer.getBoundingClientRect()
             if (this.isRoot) {
               if (x + itemsRect.width > window.innerWidth) {
-                x = window.innerWidth - itemsRect.width;
+                x = window.innerWidth - itemsRect.width
               }
             } else {
-              const parentMenu = this.getParentContextMenu();
-              const parentMenuRect = parentMenu.getBoundingClientRect();
-              const parentMenuItemsRect = parentMenu.querySelector(".x-context-menu-items").getBoundingClientRect();
-              if (parentMenuRect.x + parentMenuItemsRect.width + itemsRect.width > window.innerWidth) {
-                x = parentMenuItemsRect.x - itemsRect.width;
+              const parentMenu = this.getParentContextMenu()
+              const parentMenuRect = parentMenu.getBoundingClientRect()
+              const parentMenuItemsRect = parentMenu
+                .querySelector(".x-context-menu-items")
+                .getBoundingClientRect()
+              if (
+                parentMenuRect.x + parentMenuItemsRect.width + itemsRect.width >
+                window.innerWidth
+              ) {
+                x = parentMenuItemsRect.x - itemsRect.width
               }
             }
             if (y + itemsRect.height > window.innerHeight) {
-              y = window.innerHeight - itemsRect.height;
+              y = window.innerHeight - itemsRect.height
             }
             this.computedStyle = `
         left: ${x}px;
         top: ${y}px;
-      `;
+      `
             if (shouldCallAgain) {
               this.$nextTick(() => {
-                this.updateComputedStyle(false);
-              });
+                this.updateComputedStyle(false)
+              })
             }
-          }
+          },
         },
         mounted() {
-          this.addListeners();
-          this.$nextTick(() => this.updateComputedStyle());
+          this.addListeners()
+          this.$nextTick(() => this.updateComputedStyle())
         },
         unmounted() {
-          this.removeListeners();
-        }
-      });
-    }
-  });
+          this.removeListeners()
+        },
+      })
+    },
+  })
 
   // src/draggable.js
   var require_draggable = __commonJS({
     "src/draggable.js"(exports, module) {
-      var css = (
+      var css =
         /* css */
         `
   .x-draggable {
@@ -401,8 +412,7 @@
     user-select: none;
   }
 `
-      );
-      var template = (
+      var template =
         /* html */
         `
   <div
@@ -412,8 +422,7 @@
     <slot></slot>
   </div>
 `
-      );
-      var createVueComponentWithCSS = require_src();
+      var createVueComponentWithCSS = require_src()
       module.exports = createVueComponentWithCSS({
         name: "x-draggable",
         template,
@@ -422,23 +431,23 @@
           "is-h-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "is-v-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           x: {
             type: Number,
             required: false,
-            default: () => 0
+            default: () => 0,
           },
           y: {
             type: Number,
             required: false,
-            default: () => 0
-          }
+            default: () => 0,
+          },
         },
         data() {
           return {
@@ -446,92 +455,92 @@
             isBeingDragged: false,
             mouse: { x: 0, y: 0 },
             x_: 0,
-            y_: 0
-          };
+            y_: 0,
+          }
         },
         watch: {
           x() {
-            this.x_ = this.x;
-            this.updateComputedStyle();
+            this.x_ = this.x
+            this.updateComputedStyle()
           },
           y() {
-            this.y_ = this.y;
-            this.updateComputedStyle();
-          }
+            this.y_ = this.y
+            this.updateComputedStyle()
+          },
         },
         methods: {
           onMouseDown(event) {
-            event.preventDefault();
-            event.stopPropagation();
+            event.preventDefault()
+            event.stopPropagation()
             if (this.isHLocked && this.isVLocked) {
-              return;
+              return
             }
             if (!this.isHLocked) {
-              this.mouse.x = event.screenX;
+              this.mouse.x = event.screenX
             }
             if (!this.isVLocked) {
-              this.mouse.y = event.screenY;
+              this.mouse.y = event.screenY
             }
-            this.isBeingDragged = true;
-            this.$emit("drag-start", this.$el.getBoundingClientRect());
+            this.isBeingDragged = true
+            this.$emit("drag-start", this.$el.getBoundingClientRect())
           },
           onMouseMove(event) {
             if (this.isHLocked && this.isVLocked) {
-              return;
+              return
             }
             if (this.isBeingDragged) {
-              const dx = event.screenX - this.mouse.x;
-              const dy = event.screenY - this.mouse.y;
+              const dx = event.screenX - this.mouse.x
+              const dy = event.screenY - this.mouse.y
               if (!this.isHLocked) {
-                this.x_ += dx;
-                this.mouse.x = event.screenX;
+                this.x_ += dx
+                this.mouse.x = event.screenX
               }
               if (!this.isVLocked) {
-                this.y_ += dy;
-                this.mouse.y = event.screenY;
+                this.y_ += dy
+                this.mouse.y = event.screenY
               }
-              this.updateComputedStyle();
-              this.$emit("drag", this.$el.getBoundingClientRect());
+              this.updateComputedStyle()
+              this.$emit("drag", this.$el.getBoundingClientRect())
             }
           },
           onMouseUp() {
             if (this.isHLocked && this.isVLocked) {
-              return;
+              return
             }
-            const wasBeingDragged = this.isBeingDragged;
-            this.isBeingDragged = false;
+            const wasBeingDragged = this.isBeingDragged
+            this.isBeingDragged = false
             if (wasBeingDragged) {
-              this.$emit("drag-end", this.$el.getBoundingClientRect());
+              this.$emit("drag-end", this.$el.getBoundingClientRect())
             }
           },
           updateComputedStyle(shouldForceUpdate) {
             if (shouldForceUpdate || !this.isHLocked) {
-              this.$el.style.left = this.x_ + "px";
+              this.$el.style.left = this.x_ + "px"
             }
             if (shouldForceUpdate || !this.isVLocked) {
-              this.$el.style.top = this.y_ + "px";
+              this.$el.style.top = this.y_ + "px"
             }
-          }
+          },
         },
         mounted() {
-          this.x_ = this.x;
-          this.y_ = this.y;
-          this.updateComputedStyle(true);
-          window.addEventListener("mousemove", this.onMouseMove);
-          window.addEventListener("mouseup", this.onMouseUp);
+          this.x_ = this.x
+          this.y_ = this.y
+          this.updateComputedStyle(true)
+          window.addEventListener("mousemove", this.onMouseMove)
+          window.addEventListener("mouseup", this.onMouseUp)
         },
         unmounted() {
-          window.removeEventListener("mousemove", this.onMouseMove);
-          window.removeEventListener("mouseup", this.onMouseUp);
-        }
-      });
-    }
-  });
+          window.removeEventListener("mousemove", this.onMouseMove)
+          window.removeEventListener("mouseup", this.onMouseUp)
+        },
+      })
+    },
+  })
 
   // src/frame/horizontal.js
   var require_horizontal = __commonJS({
     "src/frame/horizontal.js"(exports, module) {
-      var css = (
+      var css =
         /* css */
         `
   .x-frame {
@@ -583,8 +592,7 @@
     cursor: unset;
   }
 `
-      );
-      var template = (
+      var template =
         /* html */
         `
   <div
@@ -596,12 +604,11 @@
     <slot></slot>
   </div>
 `
-      );
-      var createVueComponentWithCSS = require_src();
+      var createVueComponentWithCSS = require_src()
       function sum(x) {
-        let s = 0;
-        x.forEach((v) => s += v);
-        return s;
+        let s = 0
+        x.forEach(v => (s += v))
+        return s
       }
       module.exports = createVueComponentWithCSS({
         name: "x-frame-horizontal",
@@ -611,18 +618,18 @@
           "is-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "max-width": {
             type: Number,
             required: false,
-            default: () => Infinity
+            default: () => Infinity,
           },
           "min-width": {
             type: Number,
             required: false,
-            default: () => 64
-          }
+            default: () => 64,
+          },
         },
         data() {
           return {
@@ -632,152 +639,159 @@
             isBeingResized: false,
             mouse: { x: 0 },
             observer: null,
-            widths: []
-          };
+            widths: [],
+          }
         },
         methods: {
           onMouseDown(event, dividerIndex) {
-            if (this.isLocked)
-              return;
-            this.isBeingResized = true;
-            this.activeDividerIndex = dividerIndex;
+            if (this.isLocked) return
+            this.isBeingResized = true
+            this.activeDividerIndex = dividerIndex
             const nonDividers = Array.from(this.$el.children).filter(
-              (child) => !child.classList.contains("x-frame-divider")
-            );
-            const left = nonDividers[this.activeDividerIndex];
-            const right = nonDividers[this.activeDividerIndex + 1];
-            this.$emit("resize-start", [left, right]);
+              child => !child.classList.contains("x-frame-divider"),
+            )
+            const left = nonDividers[this.activeDividerIndex]
+            const right = nonDividers[this.activeDividerIndex + 1]
+            this.$emit("resize-start", [left, right])
           },
           onMouseMove(event) {
-            let left, right;
+            let left, right
             if (!this.isLocked && this.isBeingResized) {
-              const dx = event.pageX - this.mouse.x;
-              const dividers = [];
-              const nonDividers = [];
-              Array.from(this.$el.children).forEach((child) => {
+              const dx = event.pageX - this.mouse.x
+              const dividers = []
+              const nonDividers = []
+              Array.from(this.$el.children).forEach(child => {
                 if (child.classList.contains("x-frame-divider")) {
-                  dividers.push(child);
+                  dividers.push(child)
                 } else {
-                  nonDividers.push(child);
+                  nonDividers.push(child)
                 }
-              });
-              const child1 = nonDividers[this.activeDividerIndex];
-              const child2 = nonDividers[this.activeDividerIndex + 1];
-              left = child1;
-              right = child2;
-              const child1Rect = child1.getBoundingClientRect();
-              const child2Rect = child2.getBoundingClientRect();
-              this.widths[this.activeDividerIndex] = child1Rect.width + dx;
-              this.widths[this.activeDividerIndex + 1] = child2Rect.width - dx;
+              })
+              const child1 = nonDividers[this.activeDividerIndex]
+              const child2 = nonDividers[this.activeDividerIndex + 1]
+              left = child1
+              right = child2
+              const child1Rect = child1.getBoundingClientRect()
+              const child2Rect = child2.getBoundingClientRect()
+              this.widths[this.activeDividerIndex] = child1Rect.width + dx
+              this.widths[this.activeDividerIndex + 1] = child2Rect.width - dx
               if (this.widths[this.activeDividerIndex] < this.minWidth) {
-                const delta = this.widths[this.activeDividerIndex] - this.minWidth;
-                this.widths[this.activeDividerIndex] -= delta;
-                this.widths[this.activeDividerIndex + 1] += delta;
+                const delta =
+                  this.widths[this.activeDividerIndex] - this.minWidth
+                this.widths[this.activeDividerIndex] -= delta
+                this.widths[this.activeDividerIndex + 1] += delta
               }
               if (this.widths[this.activeDividerIndex] > this.maxWidth) {
-                const delta = this.widths[this.activeDividerIndex] - this.maxWidth;
-                this.widths[this.activeDividerIndex] -= delta;
-                this.widths[this.activeDividerIndex + 1] += delta;
+                const delta =
+                  this.widths[this.activeDividerIndex] - this.maxWidth
+                this.widths[this.activeDividerIndex] -= delta
+                this.widths[this.activeDividerIndex + 1] += delta
               }
               if (this.widths[this.activeDividerIndex + 1] < this.minWidth) {
-                const delta = this.widths[this.activeDividerIndex + 1] - this.minWidth;
-                this.widths[this.activeDividerIndex + 1] -= delta;
-                this.widths[this.activeDividerIndex] += delta;
+                const delta =
+                  this.widths[this.activeDividerIndex + 1] - this.minWidth
+                this.widths[this.activeDividerIndex + 1] -= delta
+                this.widths[this.activeDividerIndex] += delta
               }
               if (this.widths[this.activeDividerIndex + 1] > this.maxWidth) {
-                const delta = this.widths[this.activeDividerIndex + 1] - this.maxWidth;
-                this.widths[this.activeDividerIndex + 1] -= delta;
-                this.widths[this.activeDividerIndex] += delta;
+                const delta =
+                  this.widths[this.activeDividerIndex + 1] - this.maxWidth
+                this.widths[this.activeDividerIndex + 1] -= delta
+                this.widths[this.activeDividerIndex] += delta
               }
-              this.updateStyles();
+              this.updateStyles()
             }
-            this.mouse.x = event.pageX;
+            this.mouse.x = event.pageX
             if (!this.isLocked) {
-              this.$emit("resize", [left, right]);
+              this.$emit("resize", [left, right])
             }
           },
           onMouseUp() {
-            if (this.isLocked)
-              return;
-            const wasBeingResized = this.isBeingResized;
-            this.isBeingResized = false;
+            if (this.isLocked) return
+            const wasBeingResized = this.isBeingResized
+            this.isBeingResized = false
             if (wasBeingResized) {
               const nonDividers = Array.from(this.$el.children).filter(
-                (child) => !child.classList.contains("x-frame-divider")
-              );
-              const left = nonDividers[this.activeDividerIndex];
-              const right = nonDividers[this.activeDividerIndex + 1];
-              this.$emit("resize-end", [left, right]);
+                child => !child.classList.contains("x-frame-divider"),
+              )
+              const left = nonDividers[this.activeDividerIndex]
+              const right = nonDividers[this.activeDividerIndex + 1]
+              this.$emit("resize-end", [left, right])
             }
           },
           onMutation() {
-            if (this.isAddingDividers)
-              return;
-            this.isAddingDividers = true;
-            Array.from(this.$el.children).forEach((child) => {
+            if (this.isAddingDividers) return
+            this.isAddingDividers = true
+            Array.from(this.$el.children).forEach(child => {
               if (child.classList.contains("x-frame-divider")) {
-                this.$el.removeChild(child);
+                this.$el.removeChild(child)
               }
-            });
-            Array.from(this.$el.children).slice(1).forEach((child, i) => {
-              const divider = document.createElement("div");
-              divider.classList.add("x-frame-divider");
-              this.$el.insertBefore(divider, child);
-              const dividerInner = document.createElement("div");
-              dividerInner.classList.add("x-frame-divider-inner");
-              divider.appendChild(dividerInner);
-              divider.addEventListener("mousedown", (event) => {
-                this.onMouseDown(event, i);
-              });
-            });
+            })
+            Array.from(this.$el.children)
+              .slice(1)
+              .forEach((child, i) => {
+                const divider = document.createElement("div")
+                divider.classList.add("x-frame-divider")
+                this.$el.insertBefore(divider, child)
+                const dividerInner = document.createElement("div")
+                dividerInner.classList.add("x-frame-divider-inner")
+                divider.appendChild(dividerInner)
+                divider.addEventListener("mousedown", event => {
+                  this.onMouseDown(event, i)
+                })
+              })
             this.$nextTick(() => {
-              this.updateStyles();
-              this.isAddingDividers = false;
-            });
+              this.updateStyles()
+              this.isAddingDividers = false
+            })
           },
           updateStyles() {
-            const parentRect = this.$el.getBoundingClientRect();
-            const dividers = [];
-            const nonDividers = [];
-            Array.from(this.$el.children).forEach((child) => {
+            const parentRect = this.$el.getBoundingClientRect()
+            const dividers = []
+            const nonDividers = []
+            Array.from(this.$el.children).forEach(child => {
               if (child.classList.contains("x-frame-divider")) {
-                dividers.push(child);
+                dividers.push(child)
               } else {
-                nonDividers.push(child);
+                nonDividers.push(child)
               }
-            });
-            const parentWidth = parentRect.width - sum(dividers.map((d) => d.getBoundingClientRect().width));
+            })
+            const parentWidth =
+              parentRect.width -
+              sum(dividers.map(d => d.getBoundingClientRect().width))
             nonDividers.forEach((child, i) => {
-              const width = this.widths[i] || parentWidth / nonDividers.length;
-              this.widths[i] = width;
-              child.style.width = `${width}px`;
-            });
-          }
+              const width = this.widths[i] || parentWidth / nonDividers.length
+              this.widths[i] = width
+              child.style.width = `${width}px`
+            })
+          },
         },
         mounted() {
-          this.observer = new MutationObserver(this.onMutation);
-          this.observer.observe(this.$el, { childList: true });
-          window.addEventListener("mousemove", this.onMouseMove);
-          window.addEventListener("mouseup", this.onMouseUp);
+          this.observer = new MutationObserver(this.onMutation)
+          this.observer.observe(this.$el, { childList: true })
+          window.addEventListener("mousemove", this.onMouseMove)
+          window.addEventListener("mouseup", this.onMouseUp)
           this.$nextTick(() => {
-            this.onMutation();
-            this.widths = Array.from(this.$el.children).filter((child) => !child.classList.contains("x-frame-divider")).map((child) => child.getBoundingClientRect().width);
-            this.updateStyles();
-          });
+            this.onMutation()
+            this.widths = Array.from(this.$el.children)
+              .filter(child => !child.classList.contains("x-frame-divider"))
+              .map(child => child.getBoundingClientRect().width)
+            this.updateStyles()
+          })
         },
         unmounted() {
-          this.observer.disconnect();
-          window.removeEventListener("mousemove", this.onMouseMove);
-          window.removeEventListener("mouseup", this.onMouseUp);
-        }
-      });
-    }
-  });
+          this.observer.disconnect()
+          window.removeEventListener("mousemove", this.onMouseMove)
+          window.removeEventListener("mouseup", this.onMouseUp)
+        },
+      })
+    },
+  })
 
   // src/frame/vertical.js
   var require_vertical = __commonJS({
     "src/frame/vertical.js"(exports, module) {
-      var css = (
+      var css =
         /* css */
         `
   .x-frame {
@@ -834,8 +848,7 @@
     cursor: unset;
   }
 `
-      );
-      var template = (
+      var template =
         /* html */
         `
   <div
@@ -847,12 +860,11 @@
     <slot></slot>
   </div>
 `
-      );
-      var createVueComponentWithCSS = require_src();
+      var createVueComponentWithCSS = require_src()
       function sum(x) {
-        let s = 0;
-        x.forEach((v) => s += v);
-        return s;
+        let s = 0
+        x.forEach(v => (s += v))
+        return s
       }
       module.exports = createVueComponentWithCSS({
         name: "x-frame-vertical",
@@ -862,18 +874,18 @@
           "is-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "max-height": {
             type: Number,
             required: false,
-            default: () => Infinity
+            default: () => Infinity,
           },
           "min-height": {
             type: Number,
             required: false,
-            default: () => 64
-          }
+            default: () => 64,
+          },
         },
         data() {
           return {
@@ -883,156 +895,163 @@
             isBeingResized: false,
             mouse: { y: 0 },
             observer: null,
-            heights: []
-          };
+            heights: [],
+          }
         },
         methods: {
           onMouseDown(event, dividerIndex) {
-            if (this.isLocked)
-              return;
-            this.isBeingResized = true;
-            this.activeDividerIndex = dividerIndex;
+            if (this.isLocked) return
+            this.isBeingResized = true
+            this.activeDividerIndex = dividerIndex
             const nonDividers = Array.from(this.$el.children).filter(
-              (child) => !child.classList.contains("x-frame-divider")
-            );
-            const top = nonDividers[this.activeDividerIndex];
-            const bottom = nonDividers[this.activeDividerIndex + 1];
-            this.$emit("resize-start", [top, bottom]);
+              child => !child.classList.contains("x-frame-divider"),
+            )
+            const top = nonDividers[this.activeDividerIndex]
+            const bottom = nonDividers[this.activeDividerIndex + 1]
+            this.$emit("resize-start", [top, bottom])
           },
           onMouseMove(event) {
-            let top, bottom;
+            let top, bottom
             if (!this.isLocked && this.isBeingResized) {
-              const dy = event.pageY - this.mouse.y;
-              const dividers = [];
-              const nonDividers = [];
-              Array.from(this.$el.children).forEach((child) => {
+              const dy = event.pageY - this.mouse.y
+              const dividers = []
+              const nonDividers = []
+              Array.from(this.$el.children).forEach(child => {
                 if (child.classList.contains("x-frame-divider")) {
-                  dividers.push(child);
+                  dividers.push(child)
                 } else {
-                  nonDividers.push(child);
+                  nonDividers.push(child)
                 }
-              });
-              const child1 = nonDividers[this.activeDividerIndex];
-              const child2 = nonDividers[this.activeDividerIndex + 1];
-              top = child1;
-              bottom = child2;
-              const child1Rect = child1.getBoundingClientRect();
-              const child2Rect = child2.getBoundingClientRect();
-              this.heights[this.activeDividerIndex] = child1Rect.height + dy;
-              this.heights[this.activeDividerIndex + 1] = child2Rect.height - dy;
+              })
+              const child1 = nonDividers[this.activeDividerIndex]
+              const child2 = nonDividers[this.activeDividerIndex + 1]
+              top = child1
+              bottom = child2
+              const child1Rect = child1.getBoundingClientRect()
+              const child2Rect = child2.getBoundingClientRect()
+              this.heights[this.activeDividerIndex] = child1Rect.height + dy
+              this.heights[this.activeDividerIndex + 1] = child2Rect.height - dy
               if (this.heights[this.activeDividerIndex] < this.minHeight) {
-                const delta = this.heights[this.activeDividerIndex] - this.minHeight;
-                this.heights[this.activeDividerIndex] -= delta;
-                this.heights[this.activeDividerIndex + 1] += delta;
+                const delta =
+                  this.heights[this.activeDividerIndex] - this.minHeight
+                this.heights[this.activeDividerIndex] -= delta
+                this.heights[this.activeDividerIndex + 1] += delta
               }
               if (this.heights[this.activeDividerIndex] > this.maxHeight) {
-                const delta = this.heights[this.activeDividerIndex] - this.maxHeight;
-                this.heights[this.activeDividerIndex] -= delta;
-                this.heights[this.activeDividerIndex + 1] += delta;
+                const delta =
+                  this.heights[this.activeDividerIndex] - this.maxHeight
+                this.heights[this.activeDividerIndex] -= delta
+                this.heights[this.activeDividerIndex + 1] += delta
               }
               if (this.heights[this.activeDividerIndex + 1] < this.minHeight) {
-                const delta = this.heights[this.activeDividerIndex + 1] - this.minHeight;
-                this.heights[this.activeDividerIndex + 1] -= delta;
-                this.heights[this.activeDividerIndex] += delta;
+                const delta =
+                  this.heights[this.activeDividerIndex + 1] - this.minHeight
+                this.heights[this.activeDividerIndex + 1] -= delta
+                this.heights[this.activeDividerIndex] += delta
               }
               if (this.heights[this.activeDividerIndex + 1] > this.maxHeight) {
-                const delta = this.heights[this.activeDividerIndex + 1] - this.maxHeight;
-                this.heights[this.activeDividerIndex + 1] -= delta;
-                this.heights[this.activeDividerIndex] += delta;
+                const delta =
+                  this.heights[this.activeDividerIndex + 1] - this.maxHeight
+                this.heights[this.activeDividerIndex + 1] -= delta
+                this.heights[this.activeDividerIndex] += delta
               }
-              this.updateStyles();
+              this.updateStyles()
             }
-            this.mouse.y = event.pageY;
+            this.mouse.y = event.pageY
             if (!this.isLocked) {
-              this.$emit("resize", [top, bottom]);
+              this.$emit("resize", [top, bottom])
             }
           },
           onMouseUp() {
-            if (this.isLocked)
-              return;
-            const wasBeingResized = this.isBeingResized;
-            this.isBeingResized = false;
+            if (this.isLocked) return
+            const wasBeingResized = this.isBeingResized
+            this.isBeingResized = false
             if (wasBeingResized) {
               const nonDividers = Array.from(this.$el.children).filter(
-                (child) => !child.classList.contains("x-frame-divider")
-              );
-              const top = nonDividers[this.activeDividerIndex];
-              const bottom = nonDividers[this.activeDividerIndex + 1];
-              this.$emit("resize-end", [top, bottom]);
+                child => !child.classList.contains("x-frame-divider"),
+              )
+              const top = nonDividers[this.activeDividerIndex]
+              const bottom = nonDividers[this.activeDividerIndex + 1]
+              this.$emit("resize-end", [top, bottom])
             }
           },
           onMutation() {
-            if (this.isAddingDividers)
-              return;
-            this.isAddingDividers = true;
-            Array.from(this.$el.children).forEach((child) => {
+            if (this.isAddingDividers) return
+            this.isAddingDividers = true
+            Array.from(this.$el.children).forEach(child => {
               if (child.classList.contains("x-frame-divider")) {
-                this.$el.removeChild(child);
+                this.$el.removeChild(child)
               }
-            });
-            Array.from(this.$el.children).slice(1).forEach((child, i) => {
-              const divider = document.createElement("div");
-              divider.classList.add("x-frame-divider");
-              this.$el.insertBefore(divider, child);
-              const dividerInner = document.createElement("div");
-              dividerInner.classList.add("x-frame-divider-inner");
-              divider.appendChild(dividerInner);
-              divider.addEventListener("mousedown", (event) => {
-                this.onMouseDown(event, i);
-              });
-            });
+            })
+            Array.from(this.$el.children)
+              .slice(1)
+              .forEach((child, i) => {
+                const divider = document.createElement("div")
+                divider.classList.add("x-frame-divider")
+                this.$el.insertBefore(divider, child)
+                const dividerInner = document.createElement("div")
+                dividerInner.classList.add("x-frame-divider-inner")
+                divider.appendChild(dividerInner)
+                divider.addEventListener("mousedown", event => {
+                  this.onMouseDown(event, i)
+                })
+              })
             this.$nextTick(() => {
-              this.updateStyles();
-              this.isAddingDividers = false;
-            });
+              this.updateStyles()
+              this.isAddingDividers = false
+            })
           },
           updateStyles() {
-            const parentRect = this.$el.getBoundingClientRect();
-            const dividers = [];
-            const nonDividers = [];
-            Array.from(this.$el.children).forEach((child) => {
+            const parentRect = this.$el.getBoundingClientRect()
+            const dividers = []
+            const nonDividers = []
+            Array.from(this.$el.children).forEach(child => {
               if (child.classList.contains("x-frame-divider")) {
-                dividers.push(child);
+                dividers.push(child)
               } else {
-                nonDividers.push(child);
+                nonDividers.push(child)
               }
-            });
-            const parentHeight = parentRect.height - sum(dividers.map((d) => d.getBoundingClientRect().height));
+            })
+            const parentHeight =
+              parentRect.height -
+              sum(dividers.map(d => d.getBoundingClientRect().height))
             nonDividers.forEach((child, i) => {
-              const height = this.heights[i] || parentHeight / nonDividers.length;
-              this.heights[i] = height;
-              child.style.height = `${height}px`;
-            });
-          }
+              const height =
+                this.heights[i] || parentHeight / nonDividers.length
+              this.heights[i] = height
+              child.style.height = `${height}px`
+            })
+          },
         },
         mounted() {
-          this.observer = new MutationObserver(this.onMutation);
-          this.observer.observe(this.$el, { childList: true });
-          window.addEventListener("mousemove", this.onMouseMove);
-          window.addEventListener("mouseup", this.onMouseUp);
+          this.observer = new MutationObserver(this.onMutation)
+          this.observer.observe(this.$el, { childList: true })
+          window.addEventListener("mousemove", this.onMouseMove)
+          window.addEventListener("mouseup", this.onMouseUp)
           this.$nextTick(() => {
-            this.onMutation();
-            this.heights = Array.from(this.$el.children).filter((child) => !child.classList.contains("x-frame-divider")).map((child) => child.getBoundingClientRect().height);
-            this.updateStyles();
-          });
+            this.onMutation()
+            this.heights = Array.from(this.$el.children)
+              .filter(child => !child.classList.contains("x-frame-divider"))
+              .map(child => child.getBoundingClientRect().height)
+            this.updateStyles()
+          })
         },
         unmounted() {
-          this.observer.disconnect();
-          window.removeEventListener("mousemove", this.onMouseMove);
-          window.removeEventListener("mouseup", this.onMouseUp);
-        }
-      });
-    }
-  });
+          this.observer.disconnect()
+          window.removeEventListener("mousemove", this.onMouseMove)
+          window.removeEventListener("mouseup", this.onMouseUp)
+        },
+      })
+    },
+  })
 
   // src/frame/index.js
   var require_frame = __commonJS({
     "src/frame/index.js"(exports, module) {
-      var css = (
+      var css =
         /* css */
         ``
-      );
-      var template = (
+      var template =
         /* html */
         `
   <x-frame-horizontal
@@ -1057,53 +1076,52 @@
     <slot></slot>
   </x-frame-vertical>
 `
-      );
-      var createVueComponentWithCSS = require_src();
-      var HorizontalFrameComponent = require_horizontal();
-      var VerticalFrameComponent = require_vertical();
+      var createVueComponentWithCSS = require_src()
+      var HorizontalFrameComponent = require_horizontal()
+      var VerticalFrameComponent = require_vertical()
       module.exports = createVueComponentWithCSS({
         name: "x-frame",
         template,
         emits: ["resize", "resize-end", "resize-start"],
         components: {
           "x-frame-horizontal": HorizontalFrameComponent,
-          "x-frame-vertical": VerticalFrameComponent
+          "x-frame-vertical": VerticalFrameComponent,
         },
         props: {
           "is-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "max-size": {
             type: Number,
             required: false,
-            default: () => Infinity
+            default: () => Infinity,
           },
           "min-size": {
             type: Number,
             required: false,
-            default: () => 64
+            default: () => 64,
           },
           orientation: {
             type: String,
             required: false,
-            default: () => "horizontal"
-          }
+            default: () => "horizontal",
+          },
         },
         data() {
           return {
-            css
-          };
-        }
-      });
-    }
-  });
+            css,
+          }
+        },
+      })
+    },
+  })
 
   // src/resizeable.js
   var require_resizeable = __commonJS({
     "src/resizeable.js"(exports, module) {
-      var css = (
+      var css =
         /* css */
         `
   .no-pointer-events,
@@ -1111,8 +1129,7 @@
     pointer-events: none;
   }
 `
-      );
-      var template = (
+      var template =
         /* html */
         `
   <x-draggable
@@ -1129,9 +1146,8 @@
     <slot></slot>
   </x-draggable>
 `
-      );
-      var createVueComponentWithCSS = require_src();
-      var DraggableComponent = require_draggable();
+      var createVueComponentWithCSS = require_src()
+      var DraggableComponent = require_draggable()
       module.exports = createVueComponentWithCSS({
         name: "x-resizeable",
         template,
@@ -1141,72 +1157,72 @@
           "drag",
           "resize-end",
           "resize-start",
-          "resize"
+          "resize",
         ],
         components: {
-          "x-draggable": DraggableComponent
+          "x-draggable": DraggableComponent,
         },
         props: {
           height: {
             type: Number,
             required: false,
-            default: () => 256
+            default: () => 256,
           },
           "is-drag-h-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "is-drag-v-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "is-resize-bottom-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "is-resize-left-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "is-resize-right-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "is-resize-top-locked": {
             type: Boolean,
             required: false,
-            default: () => false
+            default: () => false,
           },
           "min-height": {
             type: Number,
             required: false,
-            default: () => 8
+            default: () => 8,
           },
           "min-width": {
             type: Number,
             required: false,
-            default: () => 8
+            default: () => 8,
           },
           width: {
             type: Number,
             required: false,
-            default: () => 256
+            default: () => 256,
           },
           x: {
             type: Number,
             required: false,
-            default: () => 0
+            default: () => 0,
           },
           y: {
             type: Number,
             required: false,
-            default: () => 0
-          }
+            default: () => 0,
+          },
         },
         data() {
           return {
@@ -1226,349 +1242,389 @@
             shouldScaleProportionally: false,
             width_: 0,
             x_: 0,
-            y_: 0
-          };
+            y_: 0,
+          }
         },
         computed: {
           isCompletelyLocked() {
-            return this.isResizeLeftLocked && this.isResizeRightLocked && this.isResizeTopLocked && this.isResizeBottomLocked;
-          }
+            return (
+              this.isResizeLeftLocked &&
+              this.isResizeRightLocked &&
+              this.isResizeTopLocked &&
+              this.isResizeBottomLocked
+            )
+          },
         },
         watch: {
           height() {
-            this.height_ = this.height;
-            this.updateComputedStyle();
+            this.height_ = this.height
+            this.updateComputedStyle()
           },
           width() {
-            this.width_ = this.width;
-            this.updateComputedStyle();
+            this.width_ = this.width
+            this.updateComputedStyle()
           },
           x() {
-            this.x_ = this.x;
+            this.x_ = this.x
           },
           y() {
-            this.y_ = this.y;
-          }
+            this.y_ = this.y
+          },
         },
         methods: {
           onDragEnd(rect) {
-            const parentRect = this.$el.parentElement.getBoundingClientRect();
+            const parentRect = this.$el.parentElement.getBoundingClientRect()
             const leftBorderWidth = parseFloat(
-              getComputedStyle(this.$el.parentElement).getPropertyValue("border-left").split("px")[0]
-            );
+              getComputedStyle(this.$el.parentElement)
+                .getPropertyValue("border-left")
+                .split("px")[0],
+            )
             const topBorderWidth = parseFloat(
-              getComputedStyle(this.$el.parentElement).getPropertyValue("border-top").split("px")[0]
-            );
-            this.x_ = rect.x - parentRect.x - leftBorderWidth;
-            this.y_ = rect.y - parentRect.y - topBorderWidth;
-            this.$emit("drag-end", rect);
+              getComputedStyle(this.$el.parentElement)
+                .getPropertyValue("border-top")
+                .split("px")[0],
+            )
+            this.x_ = rect.x - parentRect.x - leftBorderWidth
+            this.y_ = rect.y - parentRect.y - topBorderWidth
+            this.$emit("drag-end", rect)
           },
           onKeyDown(event) {
             if (this.isCompletelyLocked) {
-              return;
+              return
             }
             if (event.key === "Shift") {
-              this.shouldScaleProportionally = true;
+              this.shouldScaleProportionally = true
             }
           },
           onKeyUp(event) {
             if (this.isCompletelyLocked) {
-              return;
+              return
             }
             if (event.key === "Shift") {
-              this.shouldScaleProportionally = false;
+              this.shouldScaleProportionally = false
             }
           },
           onMouseDown(event) {
             if (this.isCompletelyLocked) {
-              return;
+              return
             }
-            let shouldCancelEvent = false;
+            let shouldCancelEvent = false
             if (this.isHoveringOverLeftBorder && !this.isResizeLeftLocked) {
-              this.isBeingResizedHorizontally = true;
-              this.anchoredLeftRightBorder = "right";
-              shouldCancelEvent = true;
+              this.isBeingResizedHorizontally = true
+              this.anchoredLeftRightBorder = "right"
+              shouldCancelEvent = true
             }
             if (this.isHoveringOverRightBorder && !this.isResizeRightLocked) {
-              this.isBeingResizedHorizontally = true;
-              this.anchoredLeftRightBorder = "left";
-              shouldCancelEvent = true;
+              this.isBeingResizedHorizontally = true
+              this.anchoredLeftRightBorder = "left"
+              shouldCancelEvent = true
             }
             if (this.isHoveringOverTopBorder && !this.isResizeTopLocked) {
-              this.isBeingResizedVertically = true;
-              this.anchoredTopBottomBorder = "bottom";
-              shouldCancelEvent = true;
+              this.isBeingResizedVertically = true
+              this.anchoredTopBottomBorder = "bottom"
+              shouldCancelEvent = true
             }
             if (this.isHoveringOverBottomBorder && !this.isResizeBottomLocked) {
-              this.isBeingResizedVertically = true;
-              this.anchoredTopBottomBorder = "top";
-              shouldCancelEvent = true;
+              this.isBeingResizedVertically = true
+              this.anchoredTopBottomBorder = "top"
+              shouldCancelEvent = true
             }
             if (shouldCancelEvent) {
-              event.preventDefault();
-              event.stopPropagation();
+              event.preventDefault()
+              event.stopPropagation()
             }
-            if (this.isBeingResizedHorizontally || this.isBeingResizedVertically) {
-              this.$emit("resize-start", this.$el.getBoundingClientRect());
+            if (
+              this.isBeingResizedHorizontally ||
+              this.isBeingResizedVertically
+            ) {
+              this.$emit("resize-start", this.$el.getBoundingClientRect())
             }
           },
           onMouseMove(event) {
             if (this.isCompletelyLocked) {
-              return;
+              return
             }
-            if (this.isBeingResizedHorizontally || this.isBeingResizedVertically) {
-              const aspect = this.width_ / this.height_;
-              let mx = event.movementX;
-              let my = event.movementY;
-              if (this.shouldScaleProportionally && this.isBeingResizedHorizontally && this.isBeingResizedVertically) {
-                const isPrimarilyHorizontal = Math.abs(mx) > Math.abs(my);
+            if (
+              this.isBeingResizedHorizontally ||
+              this.isBeingResizedVertically
+            ) {
+              const aspect = this.width_ / this.height_
+              let mx = event.movementX
+              let my = event.movementY
+              if (
+                this.shouldScaleProportionally &&
+                this.isBeingResizedHorizontally &&
+                this.isBeingResizedVertically
+              ) {
+                const isPrimarilyHorizontal = Math.abs(mx) > Math.abs(my)
                 if (this.anchoredLeftRightBorder === "left") {
                   if (this.anchoredTopBottomBorder === "top") {
                     if (isPrimarilyHorizontal) {
-                      this.width_ += mx;
-                      this.height_ = this.width_ / aspect;
+                      this.width_ += mx
+                      this.height_ = this.width_ / aspect
                     } else {
-                      this.height_ += my;
-                      this.width_ = this.height_ * aspect;
+                      this.height_ += my
+                      this.width_ = this.height_ * aspect
                     }
                     if (this.width_ < this.minWidth) {
-                      this.width_ = this.minWidth;
-                      this.height_ = this.width_ / aspect;
+                      this.width_ = this.minWidth
+                      this.height_ = this.width_ / aspect
                     }
                     if (this.height_ < this.minHeight) {
-                      this.height_ = this.minHeight;
-                      this.width_ = this.height_ * aspect;
+                      this.height_ = this.minHeight
+                      this.width_ = this.height_ * aspect
                     }
                   } else {
                     if (isPrimarilyHorizontal) {
-                      this.width_ += mx;
-                      this.height_ = this.width_ / aspect;
-                      this.y_ -= mx / aspect;
+                      this.width_ += mx
+                      this.height_ = this.width_ / aspect
+                      this.y_ -= mx / aspect
                     } else {
-                      this.height_ -= my;
-                      this.y_ += my;
-                      this.width_ = this.height_ * aspect;
+                      this.height_ -= my
+                      this.y_ += my
+                      this.width_ = this.height_ * aspect
                     }
                     if (this.width_ < this.minWidth) {
-                      const dx = this.minWidth - this.width_;
-                      this.width_ = this.minWidth;
-                      this.height_ = this.width_ / aspect;
-                      this.y_ -= dx / aspect;
+                      const dx = this.minWidth - this.width_
+                      this.width_ = this.minWidth
+                      this.height_ = this.width_ / aspect
+                      this.y_ -= dx / aspect
                     }
                     if (this.height_ < this.minHeight) {
-                      const dy = this.minHeight - this.height_;
-                      this.height_ = this.minHeight;
-                      this.y_ -= dy;
-                      this.width_ = this.height_ * aspect;
+                      const dy = this.minHeight - this.height_
+                      this.height_ = this.minHeight
+                      this.y_ -= dy
+                      this.width_ = this.height_ * aspect
                     }
                   }
                 } else {
                   if (this.anchoredTopBottomBorder === "top") {
                     if (isPrimarilyHorizontal) {
-                      this.width_ -= mx;
-                      this.x_ += mx;
-                      this.height_ = this.width_ / aspect;
+                      this.width_ -= mx
+                      this.x_ += mx
+                      this.height_ = this.width_ / aspect
                     } else {
-                      this.height_ += my;
-                      this.width_ = this.height_ * aspect;
-                      this.x_ -= my * aspect;
+                      this.height_ += my
+                      this.width_ = this.height_ * aspect
+                      this.x_ -= my * aspect
                     }
                     if (this.width_ < this.minWidth) {
-                      const dx = this.minWidth - this.width_;
-                      this.width_ = this.minWidth;
-                      this.x_ -= dx;
-                      this.height_ = this.width_ / aspect;
+                      const dx = this.minWidth - this.width_
+                      this.width_ = this.minWidth
+                      this.x_ -= dx
+                      this.height_ = this.width_ / aspect
                     }
                     if (this.height_ < this.minHeight) {
-                      const dy = this.minHeight - this.height_;
-                      this.height_ = this.minHeight;
-                      this.width_ = this.height_ * aspect;
-                      this.x_ -= dy * aspect;
+                      const dy = this.minHeight - this.height_
+                      this.height_ = this.minHeight
+                      this.width_ = this.height_ * aspect
+                      this.x_ -= dy * aspect
                     }
                   } else {
                     if (isPrimarilyHorizontal) {
-                      this.width_ -= mx;
-                      this.x_ += mx;
-                      this.height_ = this.width_ / aspect;
-                      this.y_ += mx / aspect;
+                      this.width_ -= mx
+                      this.x_ += mx
+                      this.height_ = this.width_ / aspect
+                      this.y_ += mx / aspect
                     } else {
-                      this.height_ -= my;
-                      this.y_ += my;
-                      this.width_ = this.height_ * aspect;
-                      this.x_ += my * aspect;
+                      this.height_ -= my
+                      this.y_ += my
+                      this.width_ = this.height_ * aspect
+                      this.x_ += my * aspect
                     }
                     if (this.width_ < this.minWidth) {
-                      const dx = this.minWidth - this.width_;
-                      this.width_ = this.minWidth;
-                      this.x_ -= dx;
-                      this.height_ = this.width_ / aspect;
-                      this.y_ -= dx / aspect;
+                      const dx = this.minWidth - this.width_
+                      this.width_ = this.minWidth
+                      this.x_ -= dx
+                      this.height_ = this.width_ / aspect
+                      this.y_ -= dx / aspect
                     }
                     if (this.height_ < this.minHeight) {
-                      const dy = this.minHeight - this.height_;
-                      this.height_ = this.minHeight;
-                      this.y_ -= dy;
-                      this.width_ = this.height_ * aspect;
-                      this.x_ -= dy * aspect;
+                      const dy = this.minHeight - this.height_
+                      this.height_ = this.minHeight
+                      this.y_ -= dy
+                      this.width_ = this.height_ * aspect
+                      this.x_ -= dy * aspect
                     }
                   }
                 }
               } else {
                 if (this.isBeingResizedHorizontally) {
                   if (this.anchoredLeftRightBorder === "left") {
-                    this.width_ += mx;
-                    this.width_ = Math.max(this.width_, this.minWidth);
+                    this.width_ += mx
+                    this.width_ = Math.max(this.width_, this.minWidth)
                   } else {
-                    this.width_ -= mx;
-                    this.x_ += mx;
+                    this.width_ -= mx
+                    this.x_ += mx
                     if (this.width_ < this.minWidth) {
-                      const dx = this.minWidth - this.width_;
-                      this.width_ += dx;
-                      this.x_ -= dx;
+                      const dx = this.minWidth - this.width_
+                      this.width_ += dx
+                      this.x_ -= dx
                     }
                   }
                 }
                 if (this.isBeingResizedVertically) {
                   if (this.anchoredTopBottomBorder === "top") {
-                    this.height_ += my;
-                    this.height_ = Math.max(this.height_, this.minHeight);
+                    this.height_ += my
+                    this.height_ = Math.max(this.height_, this.minHeight)
                   } else {
-                    this.height_ -= my;
-                    this.y_ += my;
+                    this.height_ -= my
+                    this.y_ += my
                     if (this.height_ < this.minHeight) {
-                      const dy = this.minHeight - this.height_;
-                      this.height_ += dy;
-                      this.y_ -= dy;
+                      const dy = this.minHeight - this.height_
+                      this.height_ += dy
+                      this.y_ -= dy
                     }
                   }
                 }
               }
-              this.updateComputedStyle();
-              event.preventDefault();
-              event.stopPropagation();
-              this.$emit("resize", this.$el.getBoundingClientRect());
+              this.updateComputedStyle()
+              event.preventDefault()
+              event.stopPropagation()
+              this.$emit("resize", this.$el.getBoundingClientRect())
             } else {
-              this.isHoveringOverLeftBorder = false;
-              this.isHoveringOverRightBorder = false;
-              this.isHoveringOverTopBorder = false;
-              this.isHoveringOverBottomBorder = false;
-              this.shouldPreventInternalPointerEvents = false;
-              const rect = this.$el.getBoundingClientRect();
-              const left = rect.x;
-              const right = rect.x + rect.width;
-              const top = rect.y;
-              const bottom = rect.y + rect.height;
-              let shouldCancelEvent = false;
-              if (Math.abs(event.clientX - left) < this.borderWidth && event.clientY >= top - this.borderWidth && event.clientY <= bottom + this.borderWidth) {
-                this.isHoveringOverLeftBorder = true;
-                this.shouldPreventInternalPointerEvents = true;
-                shouldCancelEvent = true;
+              this.isHoveringOverLeftBorder = false
+              this.isHoveringOverRightBorder = false
+              this.isHoveringOverTopBorder = false
+              this.isHoveringOverBottomBorder = false
+              this.shouldPreventInternalPointerEvents = false
+              const rect = this.$el.getBoundingClientRect()
+              const left = rect.x
+              const right = rect.x + rect.width
+              const top = rect.y
+              const bottom = rect.y + rect.height
+              let shouldCancelEvent = false
+              if (
+                Math.abs(event.clientX - left) < this.borderWidth &&
+                event.clientY >= top - this.borderWidth &&
+                event.clientY <= bottom + this.borderWidth
+              ) {
+                this.isHoveringOverLeftBorder = true
+                this.shouldPreventInternalPointerEvents = true
+                shouldCancelEvent = true
               }
-              if (Math.abs(event.clientX - right) < this.borderWidth && event.clientY >= top - this.borderWidth && event.clientY <= bottom + this.borderWidth) {
-                this.isHoveringOverRightBorder = true;
-                this.shouldPreventInternalPointerEvents = true;
-                shouldCancelEvent = true;
+              if (
+                Math.abs(event.clientX - right) < this.borderWidth &&
+                event.clientY >= top - this.borderWidth &&
+                event.clientY <= bottom + this.borderWidth
+              ) {
+                this.isHoveringOverRightBorder = true
+                this.shouldPreventInternalPointerEvents = true
+                shouldCancelEvent = true
               }
-              if (Math.abs(event.clientY - top) < this.borderWidth && event.clientX >= left - this.borderWidth && event.clientX <= right + this.borderWidth) {
-                this.isHoveringOverTopBorder = true;
-                this.shouldPreventInternalPointerEvents = true;
-                shouldCancelEvent = true;
+              if (
+                Math.abs(event.clientY - top) < this.borderWidth &&
+                event.clientX >= left - this.borderWidth &&
+                event.clientX <= right + this.borderWidth
+              ) {
+                this.isHoveringOverTopBorder = true
+                this.shouldPreventInternalPointerEvents = true
+                shouldCancelEvent = true
               }
-              if (Math.abs(event.clientY - bottom) < this.borderWidth && event.clientX >= left - this.borderWidth && event.clientX <= right + this.borderWidth) {
-                this.isHoveringOverBottomBorder = true;
-                this.shouldPreventInternalPointerEvents = true;
-                shouldCancelEvent = true;
+              if (
+                Math.abs(event.clientY - bottom) < this.borderWidth &&
+                event.clientX >= left - this.borderWidth &&
+                event.clientX <= right + this.borderWidth
+              ) {
+                this.isHoveringOverBottomBorder = true
+                this.shouldPreventInternalPointerEvents = true
+                shouldCancelEvent = true
               }
               if (shouldCancelEvent) {
-                event.preventDefault();
-                event.stopPropagation();
+                event.preventDefault()
+                event.stopPropagation()
               }
-              this.updateComputedStyle();
+              this.updateComputedStyle()
             }
           },
           onMouseUp() {
             if (this.isCompletelyLocked) {
-              return;
+              return
             }
-            const wasBeingResized = this.isBeingResizedHorizontally || this.isBeingResizedVertically;
-            this.isBeingResizedHorizontally = false;
-            this.isBeingResizedVertically = false;
-            this.isHoveringOverBorder = false;
+            const wasBeingResized =
+              this.isBeingResizedHorizontally || this.isBeingResizedVertically
+            this.isBeingResizedHorizontally = false
+            this.isBeingResizedVertically = false
+            this.isHoveringOverBorder = false
             if (wasBeingResized) {
-              this.$emit("resize-end", this.$el.getBoundingClientRect());
+              this.$emit("resize-end", this.$el.getBoundingClientRect())
             }
           },
           updateComputedStyle() {
-            const shouldResizeLeft = this.isHoveringOverLeftBorder && !this.isResizeLeftLocked;
-            const shouldResizeRight = this.isHoveringOverRightBorder && !this.isResizeRightLocked;
-            const shouldResizeTop = this.isHoveringOverTopBorder && !this.isResizeTopLocked;
-            const shouldResizeBottom = this.isHoveringOverBottomBorder && !this.isResizeBottomLocked;
-            document.body.style.cursor = "unset";
+            const shouldResizeLeft =
+              this.isHoveringOverLeftBorder && !this.isResizeLeftLocked
+            const shouldResizeRight =
+              this.isHoveringOverRightBorder && !this.isResizeRightLocked
+            const shouldResizeTop =
+              this.isHoveringOverTopBorder && !this.isResizeTopLocked
+            const shouldResizeBottom =
+              this.isHoveringOverBottomBorder && !this.isResizeBottomLocked
+            document.body.style.cursor = "unset"
             if (shouldResizeLeft || shouldResizeRight) {
-              document.body.style.cursor = "ew-resize";
+              document.body.style.cursor = "ew-resize"
             }
             if (shouldResizeTop || shouldResizeBottom) {
-              document.body.style.cursor = "ns-resize";
+              document.body.style.cursor = "ns-resize"
             }
             if (shouldResizeLeft && shouldResizeTop) {
-              document.body.style.cursor = "nwse-resize";
+              document.body.style.cursor = "nwse-resize"
             }
             if (shouldResizeLeft && shouldResizeBottom) {
-              document.body.style.cursor = "nesw-resize";
+              document.body.style.cursor = "nesw-resize"
             }
             if (shouldResizeRight && shouldResizeTop) {
-              document.body.style.cursor = "nesw-resize";
+              document.body.style.cursor = "nesw-resize"
             }
             if (shouldResizeRight && shouldResizeBottom) {
-              document.body.style.cursor = "nwse-resize";
+              document.body.style.cursor = "nwse-resize"
             }
-            this.$el.style.width = this.width_ + "px";
-            this.$el.style.minWidth = this.width_ + "px";
-            this.$el.style.maxWidth = this.width_ + "px";
-            this.$el.style.height = this.height_ + "px";
-            this.$el.style.minHeight = this.height_ + "px";
-            this.$el.style.maxHeight = this.height_ + "px";
-          }
+            this.$el.style.width = this.width_ + "px"
+            this.$el.style.minWidth = this.width_ + "px"
+            this.$el.style.maxWidth = this.width_ + "px"
+            this.$el.style.height = this.height_ + "px"
+            this.$el.style.minHeight = this.height_ + "px"
+            this.$el.style.maxHeight = this.height_ + "px"
+          },
         },
         mounted() {
-          this.x_ = this.x;
-          this.y_ = this.y;
-          this.width_ = this.width;
-          this.height_ = this.height;
-          this.updateComputedStyle();
-          window.addEventListener("keydown", this.onKeyDown);
-          window.addEventListener("keyup", this.onKeyUp);
-          window.addEventListener("mousedown", this.onMouseDown);
-          window.addEventListener("mousemove", this.onMouseMove);
-          window.addEventListener("mouseup", this.onMouseUp);
+          this.x_ = this.x
+          this.y_ = this.y
+          this.width_ = this.width
+          this.height_ = this.height
+          this.updateComputedStyle()
+          window.addEventListener("keydown", this.onKeyDown)
+          window.addEventListener("keyup", this.onKeyUp)
+          window.addEventListener("mousedown", this.onMouseDown)
+          window.addEventListener("mousemove", this.onMouseMove)
+          window.addEventListener("mouseup", this.onMouseUp)
         },
         unmounted() {
-          window.removeEventListener("keydown", this.onKeyDown);
-          window.removeEventListener("keyup", this.onKeyUp);
-          window.removeEventListener("mousedown", this.onMouseDown);
-          window.removeEventListener("mousemove", this.onMouseMove);
-          window.removeEventListener("mouseup", this.onMouseUp);
-        }
-      });
-    }
-  });
+          window.removeEventListener("keydown", this.onKeyDown)
+          window.removeEventListener("keyup", this.onKeyUp)
+          window.removeEventListener("mousedown", this.onMouseDown)
+          window.removeEventListener("mousemove", this.onMouseMove)
+          window.removeEventListener("mouseup", this.onMouseUp)
+        },
+      })
+    },
+  })
 
   // src/index.js
   var require_src2 = __commonJS({
     "src/index.js"(exports, module) {
-      var MiscVueComponents = {
+      var MiscWebComponents = {
         ContextMenu: require_context_menu(),
         Draggable: require_draggable(),
         Frame: require_frame(),
-        Resizeable: require_resizeable()
-      };
+        Resizeable: require_resizeable(),
+      }
       if (typeof module !== "undefined") {
-        module.exports = MiscVueComponents;
+        module.exports = MiscWebComponents
       }
       if (typeof window !== "undefined") {
-        window.MiscVueComponents = MiscVueComponents;
+        window.MiscWebComponents = MiscWebComponents
       }
-    }
-  });
-  require_src2();
-})();
+    },
+  })
+  require_src2()
+})()

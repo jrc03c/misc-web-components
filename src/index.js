@@ -1,4 +1,4 @@
-const MiscVueComponents = {
+const MiscWebComponents = {
   ContextMenu: require("./context-menu"),
   Draggable: require("./draggable"),
   Frame: require("./frame"),
@@ -6,9 +6,9 @@ const MiscVueComponents = {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = MiscVueComponents
+  module.exports = MiscWebComponents
 }
 
 if (typeof window !== "undefined") {
-  window.MiscVueComponents = MiscVueComponents
+  window.MiscWebComponents = MiscWebComponents
 }
