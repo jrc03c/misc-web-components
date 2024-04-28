@@ -238,7 +238,9 @@
             <input id="draggable-v-lock-input" type="checkbox" />
           </p>
 
-          <div class="demo" id="draggable-demo"></div>
+          <div class="demo" id="draggable-demo">
+            <x-draggable> I'm draggable! Drag me! </x-draggable>
+          </div>
         </div>
       </section>
 
@@ -310,11 +312,9 @@
     <script src="dist/misc-web-components.js"></script>
     <script>
       window.addEventListener("load", () => {
-        const draggable = new MiscWebComponents.Draggable()
+        const draggable = document.querySelector("x-draggable")
         draggable.dataset.x = 32
         draggable.dataset.y = 32
-        draggable.setSlotContent("I'm draggable! Drag me!")
-        document.querySelector("#draggable-demo").appendChild(draggable)
 
         const draggableHLockInput = document.querySelector(
           "#draggable-h-lock-input",

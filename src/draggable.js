@@ -48,7 +48,6 @@ class DraggableComponent extends BaseComponent {
     data = data || {}
     super(data)
     this.classList.add("x-draggable")
-    this.mutationObserver = null
     this.dataset.isBeingDragged = false
     this.dataset.isHLocked = false
     this.dataset.isVLocked = false
@@ -59,22 +58,63 @@ class DraggableComponent extends BaseComponent {
   }
 
   connectedCallback() {
+    const boundOnLockStatusChange = this.onLockStatusChange.bind(this)
     const boundOnMouseDown = this.onMouseDown.bind(this)
     const boundOnMouseMove = this.onMouseMove.bind(this)
     const boundOnMouseUp = this.onMouseUp.bind(this)
+
+    const boundOnPositionAttributeChange =
+      this.onPositionAttributeChange.bind(this)
 
     this.addEventListener("mousedown", boundOnMouseDown)
     window.addEventListener("mousemove", boundOnMouseMove)
     window.addEventListener("mouseup", boundOnMouseUp)
 
+    this.addEventListener(
+      "attribute-change:data-is-h-locked",
+      boundOnLockStatusChange,
+    )
+
+    this.addEventListener(
+      "attribute-change:data-is-v-locked",
+      boundOnLockStatusChange,
+    )
+
+    this.addEventListener(
+      "attribute-change:data-x",
+      boundOnPositionAttributeChange,
+    )
+
+    this.addEventListener(
+      "attribute-change:data-y",
+      boundOnPositionAttributeChange,
+    )
+
     this.eventListenerRemovers.push(() => {
       this.removeEventListener("mousedown", boundOnMouseDown)
       window.removeEventListener("mousemove", boundOnMouseMove)
       window.removeEventListener("mouseup", boundOnMouseUp)
-    })
 
-    this.mutationObserver = new MutationObserver(this.onMutation.bind(this))
-    this.mutationObserver.observe(this, { attributes: true })
+      this.removeEventListener(
+        "attribute-change:data-is-h-locked",
+        boundOnLockStatusChange,
+      )
+
+      this.removeEventListener(
+        "attribute-change:data-is-v-locked",
+        boundOnLockStatusChange,
+      )
+
+      this.removeEventListener(
+        "attribute-change:data-x",
+        boundOnPositionAttributeChange,
+      )
+
+      this.removeEventListener(
+        "attribute-change:data-y",
+        boundOnPositionAttributeChange,
+      )
+    })
 
     this.x_ = parseFloat(this.dataset.x)
     this.y_ = parseFloat(this.dataset.y)
@@ -90,9 +130,15 @@ class DraggableComponent extends BaseComponent {
     return super.connectedCallback()
   }
 
-  disconnectedCallback() {
-    this.mutationObserver.disconnect()
-    return super.disconnectedCallback()
+  onLockStatusChange() {
+    const isHLocked = JSON.parse(this.dataset.isHLocked)
+    const isVLocked = JSON.parse(this.dataset.isVLocked)
+
+    if (!isHLocked || !isVLocked) {
+      this.classList.add("has-grab-cursor")
+    } else {
+      this.classList.remove("has-grab-cursor")
+    }
   }
 
   onMouseDown(event) {
@@ -174,48 +220,10 @@ class DraggableComponent extends BaseComponent {
     return this
   }
 
-  onMutation(mutations) {
-    for (const mutation of mutations) {
-      if (
-        mutation.attributeName === "data-is-h-locked" ||
-        mutation.attributeName === "data-is-v-locked"
-      ) {
-        const isHLocked = JSON.parse(this.dataset.isHLocked)
-        const isVLocked = JSON.parse(this.dataset.isVLocked)
-
-        if (!isHLocked || !isVLocked) {
-          this.classList.add("has-grab-cursor")
-        } else {
-          this.classList.remove("has-grab-cursor")
-        }
-      }
-
-      if (
-        mutation.attributeName === "data-x" ||
-        mutation.attributeName === "data-y"
-      ) {
-        this.x_ = parseFloat(this.dataset.x)
-        this.y_ = parseFloat(this.dataset.y)
-        this.updateComputedStyle()
-      }
-    }
-  }
-
-  setSlotContent() {
-    const name = arguments.length === 2 ? arguments[0] : "main"
-    const content = arguments.length === 2 ? arguments[1] : arguments[0]
-    const slots = Array.from(this.querySelectorAll("slot"))
-
-    const slot =
-      slots.length === 1
-        ? slots[0]
-        : slots.find(slot => slot.getAttribute("name") === name)
-
-    if (content instanceof HTMLElement) {
-      slot.appendChild(content)
-    } else {
-      slot.innerHTML = content
-    }
+  onPositionAttributeChange() {
+    this.x_ = parseFloat(this.dataset.x)
+    this.y_ = parseFloat(this.dataset.y)
+    this.updateComputedStyle()
   }
 
   updateComputedStyle(shouldForceUpdate) {

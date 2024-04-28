@@ -5923,30 +5923,94 @@
     "src/base.js"(exports, module) {
       var makeKey = require_src2();
       var BaseComponent = class extends HTMLElement {
-        static css = "";
-        static template = "";
+        static css = `
+    x-base {
+      color: red;
+    }
+  `;
+        static instanceCount = 0;
+        static styleElement = null;
+        static template = `
+    <slot></slot>
+  `;
         eventListenerRemovers = [];
-        constructor(data) {
-          super(...arguments);
-          data = data || {};
-          this.classList.add("x-base");
-          this.id = data.id || makeKey(8);
+        mutationObserver = null;
+        constructor() {
+          super();
+          this.id = makeKey(8);
+          const currentHTML = this.innerHTML;
           this.innerHTML = this.constructor.template;
-          this.styleElement = document.createElement("style");
-          this.styleElement.innerHTML = this.constructor.css;
+          if (currentHTML.length > 0) {
+            const currentHTMLContainsSlots = currentHTML.match(/<.*?slot=".*?".*?>/g);
+            const slots = Array.from(this.querySelectorAll("slot"));
+            if (slots.length > 0) {
+              if (currentHTMLContainsSlots) {
+                const parser = new DOMParser();
+                const fragment = parser.parseFromString(currentHTML, "text/html");
+                const children = Array.from(fragment.head.children).concat(
+                  Array.from(fragment.body.children)
+                );
+                children.forEach((child) => {
+                  const slotName = child.getAttribute("slot") || "(none)";
+                  const slot = slotName === "(none)" ? slots[0] : slots.find((slot2) => slot2.name === slotName);
+                  if (slot) {
+                    slot.parentElement.replaceChild(child, slot);
+                  } else {
+                    throw new Error(
+                      `\`${this.constructor.name}\` elements do not contain "${slotName}" slots!`
+                    );
+                  }
+                });
+              } else {
+                this.innerHTML = this.innerHTML.replace(
+                  /<slot.*?>.*?<\/slot>/g,
+                  currentHTML
+                );
+              }
+            } else {
+              throw new Error(
+                `A \`${this.constructor.name}\` element received slotted content, but \`${this.constructor.name}\` elements have no slots in which to receive such content!`
+              );
+            }
+          }
+        }
+        addEventListener(name) {
+          if (name.includes("attribute-change:") && !this.mutationObserver) {
+            this.mutationObserver = new MutationObserver((mutations) => {
+              for (const mutation of mutations) {
+                if (mutation.type === "attributes") {
+                  this.dispatchEvent(
+                    new CustomEvent("attribute-change:" + mutation.attributeName)
+                  );
+                }
+              }
+            });
+            this.mutationObserver.observe(this, { attributes: true });
+          }
+          return super.addEventListener(...arguments);
         }
         connectedCallback() {
-          document.body.appendChild(this.styleElement);
+          this.constructor.instanceCount++;
+          if (this.constructor.instanceCount === 1) {
+            this.constructor.styleElement = document.createElement("style");
+            this.constructor.styleElement.innerHTML = this.constructor.css;
+            document.body.appendChild(this.constructor.styleElement);
+          }
           this.dispatchEvent(new CustomEvent("mount"));
           return this;
         }
         disconnectedCallback() {
-          this.styleElement.parentElement.removeChild(this.styleElement);
-          this.eventListenerRemovers.forEach((remove) => remove());
+          this.constructor.instanceCount--;
+          if (this.constructor.instanceCount < 1) {
+            this.constructor.styleElement.parentElement.removeChild(
+              this.constructor.styleElement
+            );
+          }
+          this.eventListenerRemovers.forEach((fn) => fn());
+          if (this.mutationObserver) {
+            this.mutationObserver.disconnect();
+          }
           this.dispatchEvent(new CustomEvent("unmount"));
-          return this;
-        }
-        setSlotContent() {
           return this;
         }
         toObject() {
@@ -5955,7 +6019,6 @@
           };
         }
       };
-      customElements.define("x-base", BaseComponent);
       module.exports = BaseComponent;
     }
   });
@@ -6002,7 +6065,6 @@
           data = data || {};
           super(data);
           this.classList.add("x-draggable");
-          this.mutationObserver = null;
           this.dataset.isBeingDragged = false;
           this.dataset.isHLocked = false;
           this.dataset.isVLocked = false;
@@ -6012,19 +6074,51 @@
           this.dataset.y = 0;
         }
         connectedCallback() {
+          const boundOnLockStatusChange = this.onLockStatusChange.bind(this);
           const boundOnMouseDown = this.onMouseDown.bind(this);
           const boundOnMouseMove = this.onMouseMove.bind(this);
           const boundOnMouseUp = this.onMouseUp.bind(this);
+          const boundOnPositionAttributeChange = this.onPositionAttributeChange.bind(this);
           this.addEventListener("mousedown", boundOnMouseDown);
           window.addEventListener("mousemove", boundOnMouseMove);
           window.addEventListener("mouseup", boundOnMouseUp);
+          this.addEventListener(
+            "attribute-change:data-is-h-locked",
+            boundOnLockStatusChange
+          );
+          this.addEventListener(
+            "attribute-change:data-is-v-locked",
+            boundOnLockStatusChange
+          );
+          this.addEventListener(
+            "attribute-change:data-x",
+            boundOnPositionAttributeChange
+          );
+          this.addEventListener(
+            "attribute-change:data-y",
+            boundOnPositionAttributeChange
+          );
           this.eventListenerRemovers.push(() => {
             this.removeEventListener("mousedown", boundOnMouseDown);
             window.removeEventListener("mousemove", boundOnMouseMove);
             window.removeEventListener("mouseup", boundOnMouseUp);
+            this.removeEventListener(
+              "attribute-change:data-is-h-locked",
+              boundOnLockStatusChange
+            );
+            this.removeEventListener(
+              "attribute-change:data-is-v-locked",
+              boundOnLockStatusChange
+            );
+            this.removeEventListener(
+              "attribute-change:data-x",
+              boundOnPositionAttributeChange
+            );
+            this.removeEventListener(
+              "attribute-change:data-y",
+              boundOnPositionAttributeChange
+            );
           });
-          this.mutationObserver = new MutationObserver(this.onMutation.bind(this));
-          this.mutationObserver.observe(this, { attributes: true });
           this.x_ = parseFloat(this.dataset.x);
           this.y_ = parseFloat(this.dataset.y);
           const isHLocked = JSON.parse(this.dataset.isHLocked);
@@ -6035,9 +6129,14 @@
           this.updateComputedStyle(true);
           return super.connectedCallback();
         }
-        disconnectedCallback() {
-          this.mutationObserver.disconnect();
-          return super.disconnectedCallback();
+        onLockStatusChange() {
+          const isHLocked = JSON.parse(this.dataset.isHLocked);
+          const isVLocked = JSON.parse(this.dataset.isVLocked);
+          if (!isHLocked || !isVLocked) {
+            this.classList.add("has-grab-cursor");
+          } else {
+            this.classList.remove("has-grab-cursor");
+          }
         }
         onMouseDown(event) {
           const isHLocked = JSON.parse(this.dataset.isHLocked);
@@ -6098,34 +6197,10 @@
           }
           return this;
         }
-        onMutation(mutations) {
-          for (const mutation of mutations) {
-            if (mutation.attributeName === "data-is-h-locked" || mutation.attributeName === "data-is-v-locked") {
-              const isHLocked = JSON.parse(this.dataset.isHLocked);
-              const isVLocked = JSON.parse(this.dataset.isVLocked);
-              if (!isHLocked || !isVLocked) {
-                this.classList.add("has-grab-cursor");
-              } else {
-                this.classList.remove("has-grab-cursor");
-              }
-            }
-            if (mutation.attributeName === "data-x" || mutation.attributeName === "data-y") {
-              this.x_ = parseFloat(this.dataset.x);
-              this.y_ = parseFloat(this.dataset.y);
-              this.updateComputedStyle();
-            }
-          }
-        }
-        setSlotContent() {
-          const name = arguments.length === 2 ? arguments[0] : "main";
-          const content = arguments.length === 2 ? arguments[1] : arguments[0];
-          const slots = Array.from(this.querySelectorAll("slot"));
-          const slot = slots.length === 1 ? slots[0] : slots.find((slot2) => slot2.getAttribute("name") === name);
-          if (content instanceof HTMLElement) {
-            slot.appendChild(content);
-          } else {
-            slot.innerHTML = content;
-          }
+        onPositionAttributeChange() {
+          this.x_ = parseFloat(this.dataset.x);
+          this.y_ = parseFloat(this.dataset.y);
+          this.updateComputedStyle();
         }
         updateComputedStyle(shouldForceUpdate) {
           if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
