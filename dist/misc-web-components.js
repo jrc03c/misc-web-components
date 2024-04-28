@@ -6026,39 +6026,37 @@
   // src/draggable.js
   var require_draggable = __commonJS({
     "src/draggable.js"(exports, module) {
-      var css = (
-        /* css */
-        `
-  x-draggable {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-
-  x-draggable.has-grab-cursor {
-    cursor: grab;
-  }
-
-  x-draggable.is-being-dragged {
-    cursor: grabbing;
-  }
-
-  x-draggable.is-being-dragged,
-  x-draggable.is-being-dragged * {
-    user-select: none;
-  }
-`
-      );
-      var template = (
-        /* html */
-        `
-  <slot></slot>
-`
-      );
       var BaseComponent = require_base();
       var DraggableComponent = class extends BaseComponent {
-        static css = css;
-        static template = template;
+        static css = (
+          /* css */
+          `
+    x-draggable {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    x-draggable.has-grab-cursor {
+      cursor: grab;
+    }
+
+    x-draggable.is-being-dragged {
+      cursor: grabbing;
+    }
+
+    x-draggable.is-being-dragged,
+    x-draggable.is-being-dragged * {
+      user-select: none;
+    }
+  `
+        );
+        static template = (
+          /* html */
+          `
+    <slot></slot>
+  `
+        );
         x_ = 0;
         y_ = 0;
         constructor(data) {
