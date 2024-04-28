@@ -17,7 +17,7 @@
       }
 
       #app {
-        display: none;
+        /* display: none; */
         width: 768px;
         margin: 0 auto;
       }
@@ -133,7 +133,7 @@
     <div id="app">
       <h1>Miscellaneous Web Components</h1>
 
-      <section>
+      <!-- <section>
         <h2>
           <span>Context Menu</span>
 
@@ -218,47 +218,31 @@
             </x-frame>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <section>
         <h2>
           <span>Draggable</span>
 
-          <button
-            :class="{ 'is-expanded': draggableSectionIsExpanded }"
-            @click="draggableSectionIsExpanded = !draggableSectionIsExpanded"
-            class="expand-button">
-            ❯
-          </button>
+          <button>❯</button>
         </h2>
 
-        <div v-if="draggableSectionIsExpanded">
+        <div>
           <p>
             Locked horizontally:
-            <input type="checkbox" v-model="draggableIsHorizontallyLocked" />
+            <input type="checkbox" />
           </p>
 
           <p>
             Locked vertically:
-            <input type="checkbox" v-model="draggableIsVerticallyLocked" />
+            <input type="checkbox" />
           </p>
 
-          <div class="demo">
-            <x-draggable
-              :class="{ 'x-draggable-floating': draggableIsBeingDragged }"
-              :is-h-locked="draggableIsHorizontallyLocked"
-              :is-v-locked="draggableIsVerticallyLocked"
-              :x="draggableX"
-              :y="draggableY"
-              @drag-end="draggableIsBeingDragged = false"
-              @drag-start="draggableIsBeingDragged = true">
-              I'm draggable! Drag me!
-            </x-draggable>
-          </div>
+          <div class="demo" id="draggable-demo"></div>
         </div>
       </section>
 
-      <section>
+      <!-- <section>
         <h2>
           <span>Resizeable</span>
 
@@ -320,112 +304,106 @@
             </x-resizeable>
           </div>
         </div>
-      </section>
+      </section> -->
     </div>
 
     <script src="dist/misc-web-components.js"></script>
     <script>
       window.addEventListener("load", () => {
-        const app = Vue.createApp({
-          components: {
-            "x-context-menu": MiscWebComponents.ContextMenu,
-            "x-draggable": MiscWebComponents.Draggable,
-            "x-frame": MiscWebComponents.Frame,
-            "x-resizeable": MiscWebComponents.Resizeable,
-          },
+        const draggable = new MiscWebComponents.Draggable()
+        draggable.dataset.x = 32
+        draggable.dataset.y = 32
+        draggable.setSlotContent("I'm draggable! Drag me!")
+        document.querySelector("#draggable-demo").appendChild(draggable)
 
-          data() {
-            return {
-              contextMenuDemoBackgroundColor: "hsl(225deg, 100%, 85%)",
-              contextMenuIsVisible: false,
-              contextMenuItems: [
-                {
-                  label: "Show an alert",
-                  action: () => alert("You have been alerted!"),
-                },
-                {
-                  label: "Change background color",
-                  action: () => {
-                    this.contextMenuDemoBackgroundColor = `hsl(${Math.random() * 360}deg, 100%, 85%)`
-                  },
-                },
-                {
-                  label: "Hover for submenu",
-                  children: [
-                    {
-                      label: "More children",
-                      children: [
-                        {
-                          label: "Even MORE children",
-                          children: [
-                            { label: "Okay, that's all!" },
-                            { label: "Goodbye!" },
-                          ],
-                        },
-                      ],
-                    },
-                    { label: "Nope." },
-                    {
-                      label: "Click here for another alert...",
-                      action: () => alert("You've been alerted AGAIN!"),
-                    },
-                  ],
-                },
-                {
-                  label: "Hover for ANOTHER submenu",
-                  children: [{ label: "A, B, C" }, { label: "1, 2, 3" }],
-                },
-              ],
-              contextMenuSectionIsExpanded: true,
-              contextMenuX: 0,
-              contextMenuY: 0,
-              draggableIsBeingDragged: false,
-              draggableIsHorizontallyLocked: false,
-              draggableIsVerticallyLocked: false,
-              draggableSectionIsExpanded: true,
-              draggableX: 32,
-              draggableY: 32,
-              frameIsBeingResized: false,
-              frameIsLocked: false,
-              frameOrientation: "horizontal",
-              frameSectionIsExpanded: true,
-              resizeableIsBeingResized: false,
-              resizeableIsHorizontalDragLocked: false,
-              resizeableIsResizeLockedBottom: false,
-              resizeableIsResizeLockedLeft: false,
-              resizeableIsResizeLockedRight: false,
-              resizeableIsResizeLockedTop: false,
-              resizeableIsVerticalDragLocked: false,
-              resizeableSectionIsExpanded: true,
-              resizeableX: 32,
-              resizeableY: 32,
-            }
-          },
+        // contextMenuDemoBackgroundColor: "hsl(225deg, 100%, 85%)",
+        // contextMenuIsVisible: false,
+        // contextMenuItems: [
+        //   {
+        //     label: "Show an alert",
+        //     action: () => alert("You have been alerted!"),
+        //   },
+        //   {
+        //     label: "Change background color",
+        //     action: () => {
+        //       this.contextMenuDemoBackgroundColor = `hsl(${Math.random() * 360}deg, 100%, 85%)`
+        //     },
+        //   },
+        //   {
+        //     label: "Hover for submenu",
+        //     children: [
+        //       {
+        //         label: "More children",
+        //         children: [
+        //           {
+        //             label: "Even MORE children",
+        //             children: [
+        //               { label: "Okay, that's all!" },
+        //               { label: "Goodbye!" },
+        //             ],
+        //           },
+        //         ],
+        //       },
+        //       { label: "Nope." },
+        //       {
+        //         label: "Click here for another alert...",
+        //         action: () => alert("You've been alerted AGAIN!"),
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     label: "Hover for ANOTHER submenu",
+        //     children: [{ label: "A, B, C" }, { label: "1, 2, 3" }],
+        //   },
+        // ],
+        // contextMenuSectionIsExpanded: true,
+        // contextMenuX: 0,
+        // contextMenuY: 0,
+        // draggableIsBeingDragged: false,
+        // draggableIsHorizontallyLocked: false,
+        // draggableIsVerticallyLocked: false,
+        // draggableSectionIsExpanded: true,
+        // draggableX: 32,
+        // draggableY: 32,
+        // frameIsBeingResized: false,
+        // frameIsLocked: false,
+        // frameOrientation: "horizontal",
+        // frameSectionIsExpanded: true,
+        // resizeableIsBeingResized: false,
+        // resizeableIsHorizontalDragLocked: false,
+        // resizeableIsResizeLockedBottom: false,
+        // resizeableIsResizeLockedLeft: false,
+        // resizeableIsResizeLockedRight: false,
+        // resizeableIsResizeLockedTop: false,
+        // resizeableIsVerticalDragLocked: false,
+        // resizeableSectionIsExpanded: true,
+        // resizeableX: 32,
+        // resizeableY: 32,
 
-          methods: {
-            range(a, b) {
-              const out = []
+        //   methods: {
+        //     range(a, b) {
+        //       const out = []
 
-              for (let i = a; i < b; i++) {
-                out.push(i)
-              }
+        //       for (let i = a; i < b; i++) {
+        //         out.push(i)
+        //       }
 
-              return out
-            },
+        //       return out
+        //     },
 
-            showContextMenu(event) {
-              this.contextMenuIsVisible = true
-              this.contextMenuX = event.clientX
-              this.contextMenuY = event.clientY
-            },
-          },
+        //     showContextMenu(event) {
+        //       this.contextMenuIsVisible = true
+        //       this.contextMenuX = event.clientX
+        //       this.contextMenuY = event.clientY
+        //     },
+        //   },
 
-          mounted() {
-            document.querySelector("#app").style.display = "block"
-          },
-        })
+        //   mounted() {
+        //     document.querySelector("#app").style.display = "block"
+        //   },
+        // })
 
-        app.mount("#app")
+        // app.mount("#app")
       })
     </script>
   </body>
