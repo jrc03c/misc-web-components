@@ -61,122 +61,15 @@ class DraggableComponent extends BaseComponent {
   connectedCallback() {
     super.connectedCallback()
 
-    const updateComputedStyle = shouldForceUpdate => {
-      if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
-        this.style.left = this.x_ + "px"
-      }
+    const boundOnMouseDown = this.onMouseDown.bind(this)
+    const boundOnMouseMove = this.onMouseMove.bind(this)
+    const boundOnMouseUp = this.onMouseUp.bind(this)
 
-      if (shouldForceUpdate || !JSON.parse(this.dataset.isVLocked)) {
-        this.style.top = this.y_ + "px"
-      }
-    }
+    this.addEventListener("mousedown", boundOnMouseDown)
+    window.addEventListener("mousemove", boundOnMouseMove)
+    window.addEventListener("mouseup", boundOnMouseUp)
 
-    this.addEventListener("mousedown", event => {
-      const isHLocked = JSON.parse(this.dataset.isHLocked)
-      const isVLocked = JSON.parse(this.dataset.isVLocked)
-
-      if (isHLocked && isVLocked) {
-        return
-      }
-
-      if (!isHLocked) {
-        this.dataset.mouseX = event.screenX
-      }
-
-      if (!isVLocked) {
-        this.dataset.mouseY = event.screenY
-      }
-
-      this.dataset.isBeingDragged = true
-      this.classList.add("is-being-dragged")
-
-      this.dispatchEvent(
-        new CustomEvent("drag-start", { detail: this.getBoundingClientRect() }),
-      )
-
-      return this
-    })
-
-    window.addEventListener("mousemove", event => {
-      const isHLocked = JSON.parse(this.dataset.isHLocked)
-      const isVLocked = JSON.parse(this.dataset.isVLocked)
-
-      if (isHLocked && isVLocked) {
-        return
-      }
-
-      if (JSON.parse(this.dataset.isBeingDragged)) {
-        const dx = event.screenX - parseFloat(this.dataset.mouseX)
-        const dy = event.screenY - parseFloat(this.dataset.mouseY)
-
-        if (!isHLocked) {
-          this.x_ += dx
-          this.dataset.mouseX = event.screenX
-        }
-
-        if (!isVLocked) {
-          this.y_ += dy
-          this.dataset.mouseY = event.screenY
-        }
-
-        updateComputedStyle()
-
-        this.dispatchEvent(
-          new CustomEvent("drag", { detail: this.getBoundingClientRect() }),
-        )
-      }
-
-      return this
-    })
-
-    window.addEventListener("mouseup", () => {
-      const isHLocked = JSON.parse(this.dataset.isHLocked)
-      const isVLocked = JSON.parse(this.dataset.isVLocked)
-
-      if (isHLocked && isVLocked) {
-        return
-      }
-
-      const wasBeingDragged = JSON.parse(this.dataset.isBeingDragged)
-      this.dataset.isBeingDragged = false
-      this.classList.remove("is-being-dragged")
-
-      if (wasBeingDragged) {
-        this.dispatchEvent(
-          new CustomEvent("drag-end", { detail: this.getBoundingClientRect() }),
-        )
-      }
-
-      return this
-    })
-
-    this.mutationObserver = new MutationObserver(mutations => {
-      for (const mutation of mutations) {
-        if (
-          mutation.attributeName === "data-is-h-locked" ||
-          mutation.attributeName === "data-is-v-locked"
-        ) {
-          const isHLocked = JSON.parse(this.dataset.isHLocked)
-          const isVLocked = JSON.parse(this.dataset.isVLocked)
-
-          if (!isHLocked || !isVLocked) {
-            this.classList.add("has-grab-cursor")
-          } else {
-            this.classList.remove("has-grab-cursor")
-          }
-        }
-
-        if (
-          mutation.attributeName === "data-x" ||
-          mutation.attributeName === "data-y"
-        ) {
-          this.x_ = parseFloat(this.dataset.x)
-          this.y_ = parseFloat(this.dataset.y)
-          updateComputedStyle()
-        }
-      }
-    })
-
+    this.mutationObserver = new MutationObserver(this.onMutation.bind(this))
     this.mutationObserver.observe(this, { attributes: true })
 
     this.x_ = parseFloat(this.dataset.x)
@@ -189,7 +82,7 @@ class DraggableComponent extends BaseComponent {
       this.classList.add("has-grab-cursor")
     }
 
-    updateComputedStyle(true)
+    this.updateComputedStyle(true)
     return this
   }
 
@@ -197,6 +90,112 @@ class DraggableComponent extends BaseComponent {
     super.disconnectedCallback()
     this.mutationObserver.disconnect()
     return this
+  }
+
+  onMouseDown(event) {
+    const isHLocked = JSON.parse(this.dataset.isHLocked)
+    const isVLocked = JSON.parse(this.dataset.isVLocked)
+
+    if (isHLocked && isVLocked) {
+      return
+    }
+
+    if (!isHLocked) {
+      this.dataset.mouseX = event.screenX
+    }
+
+    if (!isVLocked) {
+      this.dataset.mouseY = event.screenY
+    }
+
+    this.dataset.isBeingDragged = true
+    this.classList.add("is-being-dragged")
+
+    this.dispatchEvent(
+      new CustomEvent("drag-start", { detail: this.getBoundingClientRect() }),
+    )
+
+    return this
+  }
+
+  onMouseMove(event) {
+    const isHLocked = JSON.parse(this.dataset.isHLocked)
+    const isVLocked = JSON.parse(this.dataset.isVLocked)
+
+    if (isHLocked && isVLocked) {
+      return
+    }
+
+    if (JSON.parse(this.dataset.isBeingDragged)) {
+      const dx = event.screenX - parseFloat(this.dataset.mouseX)
+      const dy = event.screenY - parseFloat(this.dataset.mouseY)
+
+      if (!isHLocked) {
+        this.x_ += dx
+        this.dataset.mouseX = event.screenX
+      }
+
+      if (!isVLocked) {
+        this.y_ += dy
+        this.dataset.mouseY = event.screenY
+      }
+
+      this.updateComputedStyle()
+
+      this.dispatchEvent(
+        new CustomEvent("drag", { detail: this.getBoundingClientRect() }),
+      )
+    }
+
+    return this
+  }
+
+  onMouseUp() {
+    const isHLocked = JSON.parse(this.dataset.isHLocked)
+    const isVLocked = JSON.parse(this.dataset.isVLocked)
+
+    if (isHLocked && isVLocked) {
+      return
+    }
+
+    const wasBeingDragged = JSON.parse(this.dataset.isBeingDragged)
+    this.dataset.isBeingDragged = false
+    this.classList.remove("is-being-dragged")
+
+    if (wasBeingDragged) {
+      this.dispatchEvent(
+        new CustomEvent("drag-end", { detail: this.getBoundingClientRect() }),
+      )
+    }
+
+    return this
+  }
+
+  onMutation(mutations) {
+    for (const mutation of mutations) {
+      if (
+        mutation.attributeName === "data-is-h-locked" ||
+        mutation.attributeName === "data-is-v-locked"
+      ) {
+        const isHLocked = JSON.parse(this.dataset.isHLocked)
+        const isVLocked = JSON.parse(this.dataset.isVLocked)
+
+        if (!isHLocked || !isVLocked) {
+          this.classList.add("has-grab-cursor")
+        } else {
+          this.classList.remove("has-grab-cursor")
+        }
+      }
+
+      if (
+        mutation.attributeName === "data-x" ||
+        mutation.attributeName === "data-y"
+      ) {
+        this.x_ = parseFloat(this.dataset.x)
+        this.y_ = parseFloat(this.dataset.y)
+        this.updateComputedStyle()
+      }
+    }
   }
 
   setSlotContent() {
@@ -213,6 +212,16 @@ class DraggableComponent extends BaseComponent {
       slot.appendChild(content)
     } else {
       slot.innerHTML = content
+    }
+  }
+
+  updateComputedStyle(shouldForceUpdate) {
+    if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
+      this.style.left = this.x_ + "px"
+    }
+
+    if (shouldForceUpdate || !JSON.parse(this.dataset.isVLocked)) {
+      this.style.top = this.y_ + "px"
     }
   }
 }
