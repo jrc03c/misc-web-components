@@ -1,20 +1,11 @@
 const makeKey = require("@jrc03c/make-key")
 
 class BaseComponent extends HTMLElement {
-  static css = `
-    x-base {
-      color: red;
-    }
-  `
-
+  static css = ``
   static instanceCount = 0
   static styleElement = null
+  static template = "<slot></slot>"
 
-  static template = `
-    <slot></slot>
-  `
-
-  eventListenerRemovers = []
   mutationObserver = null
 
   constructor() {
@@ -83,7 +74,14 @@ class BaseComponent extends HTMLElement {
       this.mutationObserver.observe(this, { attributes: true })
     }
 
-    return super.addEventListener(...arguments)
+    const remover = () => {
+      super.removeEventListener(...arguments)
+      super.removeEventListener("unmount", remover)
+    }
+
+    super.addEventListener("unmount", remover)
+    super.addEventListener(...arguments)
+    return remover
   }
 
   connectedCallback() {
@@ -108,8 +106,6 @@ class BaseComponent extends HTMLElement {
       )
     }
 
-    this.eventListenerRemovers.forEach(fn => fn())
-
     if (this.mutationObserver) {
       this.mutationObserver.disconnect()
     }
@@ -126,8 +122,16 @@ class BaseComponent extends HTMLElement {
     return this.removeEventListener(...arguments)
   }
 
+  offAttributeChange(attr, callback) {
+    return this.removeEventListener("attribute-change:" + attr, callback)
+  }
+
   on() {
     return this.addEventListener(...arguments)
+  }
+
+  onAttributeChange(attr, callback) {
+    return this.addEventListener("attribute-change:" + attr, callback)
   }
 
   toObject() {

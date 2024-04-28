@@ -5923,17 +5923,10 @@
     "src/base.js"(exports, module) {
       var makeKey = require_src2();
       var BaseComponent = class extends HTMLElement {
-        static css = `
-    x-base {
-      color: red;
-    }
-  `;
+        static css = ``;
         static instanceCount = 0;
         static styleElement = null;
-        static template = `
-    <slot></slot>
-  `;
-        eventListenerRemovers = [];
+        static template = "<slot></slot>";
         mutationObserver = null;
         constructor() {
           super();
@@ -5987,7 +5980,13 @@
             });
             this.mutationObserver.observe(this, { attributes: true });
           }
-          return super.addEventListener(...arguments);
+          const remover = () => {
+            super.removeEventListener(...arguments);
+            super.removeEventListener("unmount", remover);
+          };
+          super.addEventListener("unmount", remover);
+          super.addEventListener(...arguments);
+          return remover;
         }
         connectedCallback() {
           this.constructor.instanceCount++;
@@ -6006,7 +6005,6 @@
               this.constructor.styleElement
             );
           }
-          this.eventListenerRemovers.forEach((fn) => fn());
           if (this.mutationObserver) {
             this.mutationObserver.disconnect();
           }
@@ -6019,8 +6017,14 @@
         off() {
           return this.removeEventListener(...arguments);
         }
+        offAttributeChange(attr, callback) {
+          return this.removeEventListener("attribute-change:" + attr, callback);
+        }
         on() {
           return this.addEventListener(...arguments);
+        }
+        onAttributeChange(attr, callback) {
+          return this.addEventListener("attribute-change:" + attr, callback);
         }
         toObject() {
           return {
@@ -6092,19 +6096,10 @@
           this.on("mousedown", boundOnMouseDown);
           window.addEventListener("mousemove", boundOnMouseMove);
           window.addEventListener("mouseup", boundOnMouseUp);
-          this.on("attribute-change:data-is-h-locked", boundOnLockStatusChange);
-          this.on("attribute-change:data-is-v-locked", boundOnLockStatusChange);
-          this.on("attribute-change:data-x", boundOnPositionAttributeChange);
-          this.on("attribute-change:data-y", boundOnPositionAttributeChange);
-          this.eventListenerRemovers.push(() => {
-            this.off("mousedown", boundOnMouseDown);
-            window.removeEventListener("mousemove", boundOnMouseMove);
-            window.removeEventListener("mouseup", boundOnMouseUp);
-            this.off("attribute-change:data-is-h-locked", boundOnLockStatusChange);
-            this.off("attribute-change:data-is-v-locked", boundOnLockStatusChange);
-            this.off("attribute-change:data-x", boundOnPositionAttributeChange);
-            this.off("attribute-change:data-y", boundOnPositionAttributeChange);
-          });
+          this.onAttributeChange("data-is-h-locked", boundOnLockStatusChange);
+          this.onAttributeChange("data-is-v-locked", boundOnLockStatusChange);
+          this.onAttributeChange("data-x", boundOnPositionAttributeChange);
+          this.onAttributeChange("data-y", boundOnPositionAttributeChange);
           this.x_ = parseFloat(this.dataset.x);
           this.y_ = parseFloat(this.dataset.y);
           const isHLocked = JSON.parse(this.dataset.isHLocked);

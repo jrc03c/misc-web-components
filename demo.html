@@ -335,10 +335,6 @@
             const expandButton = this.querySelector(".expand-button")
 
             expandButton.addEventListener("click", onExpandButtonClick)
-
-            this.eventListenerRemovers.push(() =>
-              expandButton.removeEventListener("click", onExpandButtonClick),
-            )
           }
         }
 
@@ -351,14 +347,6 @@
         const draggable = document.querySelector("x-draggable")
         draggable.dataset.x = 32
         draggable.dataset.y = 32
-
-        draggable.addEventListener("attribute-change:is-being-dragged", () => {
-          if (JSON.parse(draggable.dataset.isBeingDragged)) {
-            draggable.classList.add("is-being-dragged")
-          } else {
-            draggable.classList.remove("is-being-dragged")
-          }
-        })
 
         const draggableHLockInput = document.querySelector(
           "#draggable-h-lock-input",

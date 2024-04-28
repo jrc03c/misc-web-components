@@ -62,20 +62,10 @@ class DraggableComponent extends BaseComponent {
     window.addEventListener("mousemove", boundOnMouseMove)
     window.addEventListener("mouseup", boundOnMouseUp)
 
-    this.on("attribute-change:data-is-h-locked", boundOnLockStatusChange)
-    this.on("attribute-change:data-is-v-locked", boundOnLockStatusChange)
-    this.on("attribute-change:data-x", boundOnPositionAttributeChange)
-    this.on("attribute-change:data-y", boundOnPositionAttributeChange)
-
-    this.eventListenerRemovers.push(() => {
-      this.off("mousedown", boundOnMouseDown)
-      window.removeEventListener("mousemove", boundOnMouseMove)
-      window.removeEventListener("mouseup", boundOnMouseUp)
-      this.off("attribute-change:data-is-h-locked", boundOnLockStatusChange)
-      this.off("attribute-change:data-is-v-locked", boundOnLockStatusChange)
-      this.off("attribute-change:data-x", boundOnPositionAttributeChange)
-      this.off("attribute-change:data-y", boundOnPositionAttributeChange)
-    })
+    this.onAttributeChange("data-is-h-locked", boundOnLockStatusChange)
+    this.onAttributeChange("data-is-v-locked", boundOnLockStatusChange)
+    this.onAttributeChange("data-x", boundOnPositionAttributeChange)
+    this.onAttributeChange("data-y", boundOnPositionAttributeChange)
 
     this.x_ = parseFloat(this.dataset.x)
     this.y_ = parseFloat(this.dataset.y)
