@@ -42,7 +42,11 @@
         gap: 0.5rem;
       }
 
-      button.expand-button {
+      x-demo-section .expandable {
+        display: none;
+      }
+
+      x-demo-section button.expand-button {
         margin: 0;
         padding: 0;
         border: 0;
@@ -55,15 +59,19 @@
         transform: rotate(90deg);
       }
 
-      button.expand-button:hover {
+      x-demo-section button.expand-button:hover {
         background-color: rgb(245, 245, 245);
       }
 
-      button.expand-button:active {
+      x-demo-section button.expand-button:active {
         background-color: rgb(215, 215, 215);
       }
 
-      button.expand-button.is-expanded {
+      x-demo-section.is-expanded .expandable {
+        display: block;
+      }
+
+      x-demo-section.is-expanded button.expand-button {
         transform: rotate(-90deg);
       }
 
@@ -220,14 +228,13 @@
         </div>
       </section> -->
 
-      <section>
+      <x-demo-section class="is-expanded">
         <h2>
           <span>Draggable</span>
-
-          <button>❯</button>
+          <button class="expand-button">❯</button>
         </h2>
 
-        <div>
+        <div class="expandable">
           <p>
             Locked horizontally:
             <input id="draggable-h-lock-input" type="checkbox" />
@@ -242,7 +249,7 @@
             <x-draggable> I'm draggable! Drag me! </x-draggable>
           </div>
         </div>
-      </section>
+      </x-demo-section>
 
       <!-- <section>
         <h2>
@@ -312,6 +319,30 @@
     <script src="dist/misc-web-components.js"></script>
     <script>
       window.addEventListener("load", () => {
+        class DemoSectionComponent extends MiscWebComponents.Base {
+          constructor() {
+            super()
+
+            const onExpandButtonClick = () => {
+              if (this.classList.contains("is-expanded")) {
+                this.classList.remove("is-expanded")
+              } else {
+                this.classList.add("is-expanded")
+              }
+            }
+
+            const expandButton = this.querySelector(".expand-button")
+
+            expandButton.addEventListener("click", onExpandButtonClick)
+
+            this.eventListenerRemovers.push(() =>
+              expandButton.removeEventListener("click", onExpandButtonClick),
+            )
+          }
+        }
+
+        customElements.define("x-demo-section", DemoSectionComponent)
+
         const draggable = document.querySelector("x-draggable")
         draggable.dataset.x = 32
         draggable.dataset.y = 32
