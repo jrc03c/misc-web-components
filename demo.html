@@ -101,13 +101,13 @@
         height: 512px;
       }
 
-      .x-draggable {
+      x-draggable {
         padding: 1rem;
         background-color: green;
         color: white;
       }
 
-      .x-draggable-floating {
+      x-draggable.is-being-dragged {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
         transform: translateY(-2px) scale(1.05);
       }
@@ -351,6 +351,14 @@
         const draggable = document.querySelector("x-draggable")
         draggable.dataset.x = 32
         draggable.dataset.y = 32
+
+        draggable.addEventListener("attribute-change:is-being-dragged", () => {
+          if (JSON.parse(draggable.dataset.isBeingDragged)) {
+            draggable.classList.add("is-being-dragged")
+          } else {
+            draggable.classList.remove("is-being-dragged")
+          }
+        })
 
         const draggableHLockInput = document.querySelector(
           "#draggable-h-lock-input",

@@ -3,22 +3,22 @@
 // -----------------------------------------------------------------------------
 
 const css = /* css */ `
-  .x-draggable {
+  x-draggable {
     position: absolute;
     left: 0;
     top: 0;
   }
 
-  .x-draggable.has-grab-cursor {
+  x-draggable.has-grab-cursor {
     cursor: grab;
   }
 
-  .x-draggable.is-being-dragged {
+  x-draggable.is-being-dragged {
     cursor: grabbing;
   }
 
-  .x-draggable.is-being-dragged,
-  .x-draggable.is-being-dragged * {
+  x-draggable.is-being-dragged,
+  x-draggable.is-being-dragged * {
     user-select: none;
   }
 `
@@ -47,7 +47,6 @@ class DraggableComponent extends BaseComponent {
   constructor(data) {
     data = data || {}
     super(data)
-    this.classList.add("x-draggable")
     this.dataset.isBeingDragged = false
     this.dataset.isHLocked = false
     this.dataset.isVLocked = false
