@@ -6051,12 +6051,6 @@
     }
   `
         );
-        static template = (
-          /* html */
-          `
-    <slot></slot>
-  `
-        );
         x_ = 0;
         y_ = 0;
         constructor(data) {
