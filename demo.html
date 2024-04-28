@@ -230,12 +230,12 @@
         <div>
           <p>
             Locked horizontally:
-            <input type="checkbox" />
+            <input id="draggable-h-lock-input" type="checkbox" />
           </p>
 
           <p>
             Locked vertically:
-            <input type="checkbox" />
+            <input id="draggable-v-lock-input" type="checkbox" />
           </p>
 
           <div class="demo" id="draggable-demo"></div>
@@ -315,6 +315,22 @@
         draggable.dataset.y = 32
         draggable.setSlotContent("I'm draggable! Drag me!")
         document.querySelector("#draggable-demo").appendChild(draggable)
+
+        const draggableHLockInput = document.querySelector(
+          "#draggable-h-lock-input",
+        )
+
+        const draggableVLockInput = document.querySelector(
+          "#draggable-v-lock-input",
+        )
+
+        draggableHLockInput.addEventListener("input", () => {
+          draggable.dataset.isHLocked = draggableHLockInput.checked
+        })
+
+        draggableVLockInput.addEventListener("input", () => {
+          draggable.dataset.isVLocked = draggableVLockInput.checked
+        })
 
         // contextMenuDemoBackgroundColor: "hsl(225deg, 100%, 85%)",
         // contextMenuIsVisible: false,
