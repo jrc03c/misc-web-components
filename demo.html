@@ -317,6 +317,7 @@
     </div>
 
     <script src="dist/misc-web-components.js"></script>
+
     <script>
       window.addEventListener("load", () => {
         class DemoSectionComponent extends MiscWebComponents.Base {
@@ -342,7 +343,11 @@
         }
 
         customElements.define("x-demo-section", DemoSectionComponent)
+      })
+    </script>
 
+    <script>
+      window.addEventListener("load", () => {
         const draggable = document.querySelector("x-draggable")
         draggable.dataset.x = 32
         draggable.dataset.y = 32
