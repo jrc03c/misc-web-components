@@ -5937,11 +5937,13 @@
         }
         connectedCallback() {
           document.body.appendChild(this.styleElement);
+          this.dispatchEvent(new CustomEvent("mount"));
           return this;
         }
         disconnectedCallback() {
-          document.body.removeChild(this.styleElement);
+          this.styleElement.parentElement.removeChild(this.styleElement);
           this.eventListenerRemovers.forEach((remove) => remove());
+          this.dispatchEvent(new CustomEvent("unmount"));
           return this;
         }
         setSlotContent() {
@@ -6010,7 +6012,6 @@
           this.dataset.y = 0;
         }
         connectedCallback() {
-          super.connectedCallback();
           const boundOnMouseDown = this.onMouseDown.bind(this);
           const boundOnMouseMove = this.onMouseMove.bind(this);
           const boundOnMouseUp = this.onMouseUp.bind(this);
@@ -6032,12 +6033,11 @@
             this.classList.add("has-grab-cursor");
           }
           this.updateComputedStyle(true);
-          return this;
+          return super.connectedCallback();
         }
         disconnectedCallback() {
-          super.disconnectedCallback();
           this.mutationObserver.disconnect();
-          return this;
+          return super.disconnectedCallback();
         }
         onMouseDown(event) {
           const isHLocked = JSON.parse(this.dataset.isHLocked);

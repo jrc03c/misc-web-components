@@ -18,12 +18,14 @@ class BaseComponent extends HTMLElement {
 
   connectedCallback() {
     document.body.appendChild(this.styleElement)
+    this.dispatchEvent(new CustomEvent("mount"))
     return this
   }
 
   disconnectedCallback() {
-    document.body.removeChild(this.styleElement)
+    this.styleElement.parentElement.removeChild(this.styleElement)
     this.eventListenerRemovers.forEach(remove => remove())
+    this.dispatchEvent(new CustomEvent("unmount"))
     return this
   }
 

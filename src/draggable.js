@@ -59,8 +59,6 @@ class DraggableComponent extends BaseComponent {
   }
 
   connectedCallback() {
-    super.connectedCallback()
-
     const boundOnMouseDown = this.onMouseDown.bind(this)
     const boundOnMouseMove = this.onMouseMove.bind(this)
     const boundOnMouseUp = this.onMouseUp.bind(this)
@@ -89,13 +87,12 @@ class DraggableComponent extends BaseComponent {
     }
 
     this.updateComputedStyle(true)
-    return this
+    return super.connectedCallback()
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback()
     this.mutationObserver.disconnect()
-    return this
+    return super.disconnectedCallback()
   }
 
   onMouseDown(event) {
