@@ -5974,12 +5974,12 @@
     cursor: grab;
   }
 
-  .x-draggable.has-grab-cursor:active {
+  .x-draggable.is-being-dragged {
     cursor: grabbing;
   }
 
-  .x-draggable:active,
-  .x-draggable:active * {
+  .x-draggable.is-being-dragged,
+  .x-draggable.is-being-dragged * {
     user-select: none;
   }
 `
@@ -6011,109 +6011,105 @@
         }
         connectedCallback() {
           super.connectedCallback();
-          const boundOnMouseDown = this.onMouseDown.bind(this);
-          const boundOnMouseMove = this.onMouseMove.bind(this);
-          const boundOnMouseUp = this.onMouseUp.bind(this);
-          this.addEventListener("mousedown", boundOnMouseDown);
-          window.addEventListener("mousemove", boundOnMouseMove);
-          window.addEventListener("mouseup", boundOnMouseUp);
-          this.eventListenerRemovers.push(() => {
-            this.removeEventListener("mousedown", boundOnMouseDown);
+          const updateComputedStyle = (shouldForceUpdate) => {
+            if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
+              this.style.left = this.x_ + "px";
+            }
+            if (shouldForceUpdate || !JSON.parse(this.dataset.isVLocked)) {
+              this.style.top = this.y_ + "px";
+            }
+          };
+          this.addEventListener("mousedown", (event) => {
+            const isHLocked2 = JSON.parse(this.dataset.isHLocked);
+            const isVLocked2 = JSON.parse(this.dataset.isVLocked);
+            if (isHLocked2 && isVLocked2) {
+              return;
+            }
+            if (!isHLocked2) {
+              this.dataset.mouseX = event.screenX;
+            }
+            if (!isVLocked2) {
+              this.dataset.mouseY = event.screenY;
+            }
+            this.dataset.isBeingDragged = true;
+            this.classList.add("is-being-dragged");
+            this.dispatchEvent(
+              new CustomEvent("drag-start", { detail: this.getBoundingClientRect() })
+            );
+            return this;
           });
-          this.eventListenerRemovers.push(() => {
-            window.removeEventListener("mousemove", boundOnMouseMove);
+          window.addEventListener("mousemove", (event) => {
+            const isHLocked2 = JSON.parse(this.dataset.isHLocked);
+            const isVLocked2 = JSON.parse(this.dataset.isVLocked);
+            if (isHLocked2 && isVLocked2) {
+              return;
+            }
+            if (JSON.parse(this.dataset.isBeingDragged)) {
+              const dx = event.screenX - parseFloat(this.dataset.mouseX);
+              const dy = event.screenY - parseFloat(this.dataset.mouseY);
+              if (!isHLocked2) {
+                this.x_ += dx;
+                this.dataset.mouseX = event.screenX;
+              }
+              if (!isVLocked2) {
+                this.y_ += dy;
+                this.dataset.mouseY = event.screenY;
+              }
+              updateComputedStyle();
+              this.dispatchEvent(
+                new CustomEvent("drag", { detail: this.getBoundingClientRect() })
+              );
+            }
+            return this;
           });
-          this.eventListenerRemovers.push(() => {
-            window.removeEventListener("mouseup", boundOnMouseUp);
+          window.addEventListener("mouseup", () => {
+            const isHLocked2 = JSON.parse(this.dataset.isHLocked);
+            const isVLocked2 = JSON.parse(this.dataset.isVLocked);
+            if (isHLocked2 && isVLocked2) {
+              return;
+            }
+            const wasBeingDragged = JSON.parse(this.dataset.isBeingDragged);
+            this.dataset.isBeingDragged = false;
+            this.classList.remove("is-being-dragged");
+            if (wasBeingDragged) {
+              this.dispatchEvent(
+                new CustomEvent("drag-end", { detail: this.getBoundingClientRect() })
+              );
+            }
+            return this;
           });
-          this.mutationObserver = new MutationObserver(this.onMutation.bind(this));
+          this.mutationObserver = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+              if (mutation.attributeName === "data-is-h-locked" || mutation.attributeName === "data-is-v-locked") {
+                const isHLocked2 = JSON.parse(this.dataset.isHLocked);
+                const isVLocked2 = JSON.parse(this.dataset.isVLocked);
+                if (!isHLocked2 || !isVLocked2) {
+                  this.classList.add("has-grab-cursor");
+                } else {
+                  this.classList.remove("has-grab-cursor");
+                }
+              }
+              if (mutation.attributeName === "data-x" || mutation.attributeName === "data-y") {
+                this.x_ = parseFloat(this.dataset.x);
+                this.y_ = parseFloat(this.dataset.y);
+                updateComputedStyle();
+              }
+            }
+          });
           this.mutationObserver.observe(this, { attributes: true });
           this.x_ = parseFloat(this.dataset.x);
           this.y_ = parseFloat(this.dataset.y);
-          this.updateComputedStyle(true);
+          const isHLocked = JSON.parse(this.dataset.isHLocked);
+          const isVLocked = JSON.parse(this.dataset.isVLocked);
+          if (!isHLocked || !isVLocked) {
+            this.classList.add("has-grab-cursor");
+          }
+          updateComputedStyle(true);
           return this;
         }
         disconnectedCallback() {
           super.disconnectedCallback();
           this.mutationObserver.disconnect();
-          return this;
-        }
-        onMouseDown(event) {
-          event.preventDefault();
-          event.stopPropagation();
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (isHLocked && isVLocked) {
-            return;
-          }
-          if (!isHLocked) {
-            this.dataset.mouseX = event.screenX;
-          }
-          if (!isVLocked) {
-            this.dataset.mouseY = event.screenY;
-          }
-          this.dataset.isBeingDragged = true;
-          this.dispatchEvent(
-            new CustomEvent("drag-start", { detail: this.getBoundingClientRect() })
-          );
-          return this;
-        }
-        onMouseMove(event) {
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (isHLocked && isVLocked) {
-            return;
-          }
-          if (JSON.parse(this.dataset.isBeingDragged)) {
-            const dx = event.screenX - parseFloat(this.dataset.mouseX);
-            const dy = event.screenY - parseFloat(this.dataset.mouseY);
-            if (!isHLocked) {
-              this.x_ += dx;
-              this.dataset.mouseX = event.screenX;
-            }
-            if (!isVLocked) {
-              this.y_ += dy;
-              this.dataset.mouseY = event.screenY;
-            }
-            this.updateComputedStyle();
-            this.dispatchEvent(
-              new CustomEvent("drag", { detail: this.getBoundingClientRect() })
-            );
-          }
-          return this;
-        }
-        onMouseUp() {
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (isHLocked && isVLocked) {
-            return;
-          }
-          const wasBeingDragged = JSON.parse(this.dataset.isBeingDragged);
-          this.dataset.isBeingDragged = false;
-          if (wasBeingDragged) {
-            this.dispatchEvent(
-              new CustomEvent("drag-end", { detail: this.getBoundingClientRect() })
-            );
-          }
-          return this;
-        }
-        onMutation(mutations) {
-          for (const mutation of mutations) {
-            if (mutation.attributeName === "data-is-h-locked" || mutation.attributeName === "data-is-v-locked") {
-              const isHLocked = JSON.parse(this.dataset.isHLocked);
-              const isVLocked = JSON.parse(this.dataset.isVLocked);
-              if (isHLocked || isVLocked) {
-                this.classList.add("has-grab-cursor");
-              } else {
-                this.classList.remove("has-grab-cursor");
-              }
-            }
-            if (mutation.attributeName === "data-x" || mutation.attributeName === "data-y") {
-              this.x_ = parseFloat(this.dataset.x);
-              this.y_ = parseFloat(this.dataset.y);
-              this.updateComputedStyle();
-            }
-          }
           return this;
         }
         setSlotContent() {
@@ -6125,14 +6121,6 @@
             slot.appendChild(content);
           } else {
             slot.innerHTML = content;
-          }
-        }
-        updateComputedStyle(shouldForceUpdate) {
-          if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
-            this.style.left = this.x_ + "px";
-          }
-          if (shouldForceUpdate || !JSON.parse(this.dataset.isVLocked)) {
-            this.style.top = this.y_ + "px";
           }
         }
       };
