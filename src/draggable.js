@@ -1,45 +1,30 @@
-// -----------------------------------------------------------------------------
-// CSS
-// -----------------------------------------------------------------------------
-
-const css = /* css */ `
-  x-draggable {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-
-  x-draggable.has-grab-cursor {
-    cursor: grab;
-  }
-
-  x-draggable.is-being-dragged {
-    cursor: grabbing;
-  }
-
-  x-draggable.is-being-dragged,
-  x-draggable.is-being-dragged * {
-    user-select: none;
-  }
-`
-
-// -----------------------------------------------------------------------------
-// HTML
-// -----------------------------------------------------------------------------
-
-const template = /* html */ `
-  <slot></slot>
-`
-
-// -----------------------------------------------------------------------------
-// JS
-// -----------------------------------------------------------------------------
-
 const BaseComponent = require("./base")
 
 class DraggableComponent extends BaseComponent {
-  static css = css
-  static template = template
+  static css = /* css */ `
+    x-draggable {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    x-draggable.has-grab-cursor {
+      cursor: grab;
+    }
+
+    x-draggable.is-being-dragged {
+      cursor: grabbing;
+    }
+
+    x-draggable.is-being-dragged,
+    x-draggable.is-being-dragged * {
+      user-select: none;
+    }
+  `
+
+  static template = /* html */ `
+    <slot></slot>
+  `
 
   x_ = 0
   y_ = 0
