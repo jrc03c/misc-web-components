@@ -6017,6 +6017,11 @@
           this.addEventListener("mousedown", boundOnMouseDown);
           window.addEventListener("mousemove", boundOnMouseMove);
           window.addEventListener("mouseup", boundOnMouseUp);
+          this.eventListenerRemovers.push(() => {
+            this.removeEventListener("mousedown", boundOnMouseDown);
+            window.removeEventListener("mousemove", boundOnMouseMove);
+            window.removeEventListener("mouseup", boundOnMouseUp);
+          });
           this.mutationObserver = new MutationObserver(this.onMutation.bind(this));
           this.mutationObserver.observe(this, { attributes: true });
           this.x_ = parseFloat(this.dataset.x);
