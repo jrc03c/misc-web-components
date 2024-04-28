@@ -1,4 +1,5 @@
 const MiscWebComponents = {
+  Base: require("./base"),
   // ContextMenu: require("./context-menu"),
   Draggable: require("./draggable"),
   // Frame: require("./frame"),

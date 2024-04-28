@@ -6220,6 +6220,7 @@
   var require_src3 = __commonJS({
     "src/index.js"(exports, module) {
       var MiscWebComponents = {
+        Base: require_base(),
         // ContextMenu: require("./context-menu"),
         Draggable: require_draggable()
         // Frame: require("./frame"),
