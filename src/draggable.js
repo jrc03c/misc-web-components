@@ -35,9 +35,21 @@ class DraggableComponent extends BaseComponent {
     this.dataset.mouseY = 0
     this.dataset.x = 0
     this.dataset.y = 0
+    this.on("mount", this.onMount)
   }
 
-  connectedCallback() {
+  onLockStatusChange() {
+    const isHLocked = JSON.parse(this.dataset.isHLocked)
+    const isVLocked = JSON.parse(this.dataset.isVLocked)
+
+    if (!isHLocked || !isVLocked) {
+      this.classList.add("has-grab-cursor")
+    } else {
+      this.classList.remove("has-grab-cursor")
+    }
+  }
+
+  onMount() {
     const boundOnLockStatusChange = this.onLockStatusChange.bind(this)
     const boundOnMouseDown = this.onMouseDown.bind(this)
     const boundOnMouseMove = this.onMouseMove.bind(this)
@@ -46,54 +58,23 @@ class DraggableComponent extends BaseComponent {
     const boundOnPositionAttributeChange =
       this.onPositionAttributeChange.bind(this)
 
-    this.addEventListener("mousedown", boundOnMouseDown)
+    this.on("mousedown", boundOnMouseDown)
     window.addEventListener("mousemove", boundOnMouseMove)
     window.addEventListener("mouseup", boundOnMouseUp)
 
-    this.addEventListener(
-      "attribute-change:data-is-h-locked",
-      boundOnLockStatusChange,
-    )
-
-    this.addEventListener(
-      "attribute-change:data-is-v-locked",
-      boundOnLockStatusChange,
-    )
-
-    this.addEventListener(
-      "attribute-change:data-x",
-      boundOnPositionAttributeChange,
-    )
-
-    this.addEventListener(
-      "attribute-change:data-y",
-      boundOnPositionAttributeChange,
-    )
+    this.on("attribute-change:data-is-h-locked", boundOnLockStatusChange)
+    this.on("attribute-change:data-is-v-locked", boundOnLockStatusChange)
+    this.on("attribute-change:data-x", boundOnPositionAttributeChange)
+    this.on("attribute-change:data-y", boundOnPositionAttributeChange)
 
     this.eventListenerRemovers.push(() => {
-      this.removeEventListener("mousedown", boundOnMouseDown)
+      this.off("mousedown", boundOnMouseDown)
       window.removeEventListener("mousemove", boundOnMouseMove)
       window.removeEventListener("mouseup", boundOnMouseUp)
-
-      this.removeEventListener(
-        "attribute-change:data-is-h-locked",
-        boundOnLockStatusChange,
-      )
-
-      this.removeEventListener(
-        "attribute-change:data-is-v-locked",
-        boundOnLockStatusChange,
-      )
-
-      this.removeEventListener(
-        "attribute-change:data-x",
-        boundOnPositionAttributeChange,
-      )
-
-      this.removeEventListener(
-        "attribute-change:data-y",
-        boundOnPositionAttributeChange,
-      )
+      this.off("attribute-change:data-is-h-locked", boundOnLockStatusChange)
+      this.off("attribute-change:data-is-v-locked", boundOnLockStatusChange)
+      this.off("attribute-change:data-x", boundOnPositionAttributeChange)
+      this.off("attribute-change:data-y", boundOnPositionAttributeChange)
     })
 
     this.x_ = parseFloat(this.dataset.x)
@@ -107,18 +88,7 @@ class DraggableComponent extends BaseComponent {
     }
 
     this.updateComputedStyle(true)
-    return super.connectedCallback()
-  }
-
-  onLockStatusChange() {
-    const isHLocked = JSON.parse(this.dataset.isHLocked)
-    const isVLocked = JSON.parse(this.dataset.isVLocked)
-
-    if (!isHLocked || !isVLocked) {
-      this.classList.add("has-grab-cursor")
-    } else {
-      this.classList.remove("has-grab-cursor")
-    }
+    this.off("mount", this.onMount)
   }
 
   onMouseDown(event) {

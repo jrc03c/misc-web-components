@@ -6013,6 +6013,15 @@
           this.dispatchEvent(new CustomEvent("unmount"));
           return this;
         }
+        emit(eventName, payload) {
+          return this.dispatchEvent(new CustomEvent(eventName, { details: payload }));
+        }
+        off() {
+          return this.removeEventListener(...arguments);
+        }
+        on() {
+          return this.addEventListener(...arguments);
+        }
         toObject() {
           return {
             id: this.id
@@ -6063,62 +6072,7 @@
           this.dataset.mouseY = 0;
           this.dataset.x = 0;
           this.dataset.y = 0;
-        }
-        connectedCallback() {
-          const boundOnLockStatusChange = this.onLockStatusChange.bind(this);
-          const boundOnMouseDown = this.onMouseDown.bind(this);
-          const boundOnMouseMove = this.onMouseMove.bind(this);
-          const boundOnMouseUp = this.onMouseUp.bind(this);
-          const boundOnPositionAttributeChange = this.onPositionAttributeChange.bind(this);
-          this.addEventListener("mousedown", boundOnMouseDown);
-          window.addEventListener("mousemove", boundOnMouseMove);
-          window.addEventListener("mouseup", boundOnMouseUp);
-          this.addEventListener(
-            "attribute-change:data-is-h-locked",
-            boundOnLockStatusChange
-          );
-          this.addEventListener(
-            "attribute-change:data-is-v-locked",
-            boundOnLockStatusChange
-          );
-          this.addEventListener(
-            "attribute-change:data-x",
-            boundOnPositionAttributeChange
-          );
-          this.addEventListener(
-            "attribute-change:data-y",
-            boundOnPositionAttributeChange
-          );
-          this.eventListenerRemovers.push(() => {
-            this.removeEventListener("mousedown", boundOnMouseDown);
-            window.removeEventListener("mousemove", boundOnMouseMove);
-            window.removeEventListener("mouseup", boundOnMouseUp);
-            this.removeEventListener(
-              "attribute-change:data-is-h-locked",
-              boundOnLockStatusChange
-            );
-            this.removeEventListener(
-              "attribute-change:data-is-v-locked",
-              boundOnLockStatusChange
-            );
-            this.removeEventListener(
-              "attribute-change:data-x",
-              boundOnPositionAttributeChange
-            );
-            this.removeEventListener(
-              "attribute-change:data-y",
-              boundOnPositionAttributeChange
-            );
-          });
-          this.x_ = parseFloat(this.dataset.x);
-          this.y_ = parseFloat(this.dataset.y);
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (!isHLocked || !isVLocked) {
-            this.classList.add("has-grab-cursor");
-          }
-          this.updateComputedStyle(true);
-          return super.connectedCallback();
+          this.on("mount", this.onMount);
         }
         onLockStatusChange() {
           const isHLocked = JSON.parse(this.dataset.isHLocked);
@@ -6128,6 +6082,38 @@
           } else {
             this.classList.remove("has-grab-cursor");
           }
+        }
+        onMount() {
+          const boundOnLockStatusChange = this.onLockStatusChange.bind(this);
+          const boundOnMouseDown = this.onMouseDown.bind(this);
+          const boundOnMouseMove = this.onMouseMove.bind(this);
+          const boundOnMouseUp = this.onMouseUp.bind(this);
+          const boundOnPositionAttributeChange = this.onPositionAttributeChange.bind(this);
+          this.on("mousedown", boundOnMouseDown);
+          window.addEventListener("mousemove", boundOnMouseMove);
+          window.addEventListener("mouseup", boundOnMouseUp);
+          this.on("attribute-change:data-is-h-locked", boundOnLockStatusChange);
+          this.on("attribute-change:data-is-v-locked", boundOnLockStatusChange);
+          this.on("attribute-change:data-x", boundOnPositionAttributeChange);
+          this.on("attribute-change:data-y", boundOnPositionAttributeChange);
+          this.eventListenerRemovers.push(() => {
+            this.off("mousedown", boundOnMouseDown);
+            window.removeEventListener("mousemove", boundOnMouseMove);
+            window.removeEventListener("mouseup", boundOnMouseUp);
+            this.off("attribute-change:data-is-h-locked", boundOnLockStatusChange);
+            this.off("attribute-change:data-is-v-locked", boundOnLockStatusChange);
+            this.off("attribute-change:data-x", boundOnPositionAttributeChange);
+            this.off("attribute-change:data-y", boundOnPositionAttributeChange);
+          });
+          this.x_ = parseFloat(this.dataset.x);
+          this.y_ = parseFloat(this.dataset.y);
+          const isHLocked = JSON.parse(this.dataset.isHLocked);
+          const isVLocked = JSON.parse(this.dataset.isVLocked);
+          if (!isHLocked || !isVLocked) {
+            this.classList.add("has-grab-cursor");
+          }
+          this.updateComputedStyle(true);
+          this.off("mount", this.onMount);
         }
         onMouseDown(event) {
           const isHLocked = JSON.parse(this.dataset.isHLocked);

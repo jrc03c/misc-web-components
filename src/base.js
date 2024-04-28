@@ -118,6 +118,18 @@ class BaseComponent extends HTMLElement {
     return this
   }
 
+  emit(eventName, payload) {
+    return this.dispatchEvent(new CustomEvent(eventName, { details: payload }))
+  }
+
+  off() {
+    return this.removeEventListener(...arguments)
+  }
+
+  on() {
+    return this.addEventListener(...arguments)
+  }
+
   toObject() {
     return {
       id: this.id,
