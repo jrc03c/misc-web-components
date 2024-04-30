@@ -5927,7 +5927,7 @@
         static instanceCount = 0;
         static styleElement = null;
         static template = "<slot></slot>";
-        mutationObserver = null;
+        mutationObservers = [];
         constructor() {
           super();
           this.id = makeKey(8);
@@ -5967,19 +5967,7 @@
             }
           }
         }
-        addEventListener(name) {
-          if (name.includes("attribute-change:") && !this.mutationObserver) {
-            this.mutationObserver = new MutationObserver((mutations) => {
-              for (const mutation of mutations) {
-                if (mutation.type === "attributes") {
-                  this.dispatchEvent(
-                    new CustomEvent("attribute-change:" + mutation.attributeName)
-                  );
-                }
-              }
-            });
-            this.mutationObserver.observe(this, { attributes: true });
-          }
+        addEventListener() {
           const remover = () => {
             super.removeEventListener(...arguments);
             super.removeEventListener("unmount", remover);
@@ -5995,6 +5983,17 @@
             this.constructor.styleElement.innerHTML = this.constructor.css;
             document.body.appendChild(this.constructor.styleElement);
           }
+          const attributeObserver = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+              if (mutation.type === "attributes") {
+                this.dispatchEvent(
+                  new CustomEvent("attribute-change:" + mutation.attributeName)
+                );
+              }
+            }
+          });
+          attributeObserver.observe(this, { attributes: true });
+          this.mutationObservers.push(attributeObserver);
           this.dispatchEvent(new CustomEvent("mount"));
           return this;
         }
@@ -6005,9 +6004,7 @@
               this.constructor.styleElement
             );
           }
-          if (this.mutationObserver) {
-            this.mutationObserver.disconnect();
-          }
+          this.mutationObservers.forEach((observer) => observer.disconnect());
           this.dispatchEvent(new CustomEvent("unmount"));
           return this;
         }
