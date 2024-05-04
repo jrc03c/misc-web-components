@@ -61,6 +61,24 @@ class BaseComponent extends HTMLElement {
     )
   }
 
+  connectedCallback() {
+    if (super.connectedCallback) {
+      super.connectedCallback()
+    }
+
+    this.dispatchEvent(new CustomEvent("mount"))
+    return this
+  }
+
+  disconnectedCallback() {
+    if (super.disconnectedCallback) {
+      super.disconnectedCallback()
+    }
+
+    this.dispatchEvent(new CustomEvent("unmount"))
+    return this
+  }
+
   querySelector() {
     return getAllElements(this).find(el => el.matches(...arguments))
   }

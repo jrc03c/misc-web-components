@@ -1,9 +1,9 @@
 const MiscWebComponents = {
-  Base: require("./base"),
-  // ContextMenu: require("./context-menu"),
-  Draggable: require("./draggable"),
-  // Frame: require("./frame"),
-  // Resizeable: require("./resizeable"),
+  BaseComponent: require("./base"),
+  // ContextMenuComponent: require("./context-menu"),
+  // DraggableComponent: require("./draggable"),
+  // FrameComponent: require("./frame"),
+  // ResizeableComponent: require("./resizeable"),
 }
 
 if (typeof module !== "undefined") {
