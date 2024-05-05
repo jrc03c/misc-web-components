@@ -44,6 +44,8 @@ class BaseComponent extends HTMLElement {
     </template>
   `
 
+  mutationObservers = []
+
   constructor() {
     super()
 
@@ -61,10 +63,29 @@ class BaseComponent extends HTMLElement {
     )
   }
 
+  addAttributeChangeListener(attributeName, callback) {
+    return this.addEventListener("attribute-change:" + attributeName, callback)
+  }
+
   connectedCallback() {
     if (super.connectedCallback) {
       super.connectedCallback()
     }
+
+    const attributeObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName) {
+          this.dispatchEvent(new CustomEvent("attribute-change"))
+
+          this.dispatchEvent(
+            new CustomEvent("attribute-change:" + mutation.attributeName),
+          )
+        }
+      })
+    })
+
+    attributeObserver.observe(this, { attributes: true })
+    this.mutationObservers.push(attributeObserver)
 
     this.dispatchEvent(new CustomEvent("mount"))
     return this
@@ -75,6 +96,7 @@ class BaseComponent extends HTMLElement {
       super.disconnectedCallback()
     }
 
+    this.mutationObservers.forEach(observer => observer.disconnect())
     this.dispatchEvent(new CustomEvent("unmount"))
     return this
   }
@@ -85,6 +107,13 @@ class BaseComponent extends HTMLElement {
 
   querySelectorAll() {
     return getAllElements(this).filter(el => el.matches(...arguments))
+  }
+
+  removeAttributeChangeListener(attributeName, callback) {
+    return this.removeEventListener(
+      "attribute-change:" + attributeName,
+      callback,
+    )
   }
 }
 

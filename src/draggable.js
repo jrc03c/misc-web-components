@@ -1,25 +1,33 @@
 const BaseComponent = require("./base")
 
 class DraggableComponent extends BaseComponent {
-  static css = /* css */ `
-    x-draggable {
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
+  static template = /* html */ `
+    <template>
+      <style>
+        .x-draggable {
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
 
-    x-draggable.has-grab-cursor {
-      cursor: grab;
-    }
+        .x-draggable.has-grab-cursor {
+          cursor: grab;
+        }
 
-    x-draggable.is-being-dragged {
-      cursor: grabbing;
-    }
+        .x-draggable.is-being-dragged {
+          cursor: grabbing;
+        }
 
-    x-draggable.is-being-dragged,
-    x-draggable.is-being-dragged * {
-      user-select: none;
-    }
+        .x-draggable.is-being-dragged,
+        .x-draggable.is-being-dragged * {
+          user-select: none;
+        }
+      </style>
+
+      <div class="x-draggable">
+        <slot></slot>
+      </div>
+    </template>
   `
 
   x_ = 0
@@ -28,6 +36,7 @@ class DraggableComponent extends BaseComponent {
   constructor(data) {
     data = data || {}
     super(data)
+    this.inner = this.querySelector(".x-draggable")
     this.dataset.isBeingDragged = false
     this.dataset.isHLocked = false
     this.dataset.isVLocked = false
@@ -35,7 +44,7 @@ class DraggableComponent extends BaseComponent {
     this.dataset.mouseY = 0
     this.dataset.x = 0
     this.dataset.y = 0
-    this.on("mount", this.onMount)
+    this.addEventListener("mount", this.onMount)
   }
 
   onLockStatusChange() {
@@ -43,9 +52,9 @@ class DraggableComponent extends BaseComponent {
     const isVLocked = JSON.parse(this.dataset.isVLocked)
 
     if (!isHLocked || !isVLocked) {
-      this.classList.add("has-grab-cursor")
+      this.inner.classList.add("has-grab-cursor")
     } else {
-      this.classList.remove("has-grab-cursor")
+      this.inner.classList.remove("has-grab-cursor")
     }
   }
 
@@ -54,18 +63,18 @@ class DraggableComponent extends BaseComponent {
     const boundOnMouseDown = this.onMouseDown.bind(this)
     const boundOnMouseMove = this.onMouseMove.bind(this)
     const boundOnMouseUp = this.onMouseUp.bind(this)
+    const boundOnPositionChange = this.onPositionChange.bind(this)
 
-    const boundOnPositionAttributeChange =
-      this.onPositionAttributeChange.bind(this)
-
-    this.on("mousedown", boundOnMouseDown)
+    this.addEventListener("mousedown", boundOnMouseDown)
     window.addEventListener("mousemove", boundOnMouseMove)
     window.addEventListener("mouseup", boundOnMouseUp)
 
-    this.onAttributeChange("data-is-h-locked", boundOnLockStatusChange)
-    this.onAttributeChange("data-is-v-locked", boundOnLockStatusChange)
-    this.onAttributeChange("data-x", boundOnPositionAttributeChange)
-    this.onAttributeChange("data-y", boundOnPositionAttributeChange)
+    this.addAttributeChangeListener("data-is-h-locked", boundOnLockStatusChange)
+
+    this.addAttributeChangeListener("data-is-v-locked", boundOnLockStatusChange)
+
+    this.addAttributeChangeListener("data-x", boundOnPositionChange)
+    this.addAttributeChangeListener("data-y", boundOnPositionChange)
 
     this.x_ = parseFloat(this.dataset.x)
     this.y_ = parseFloat(this.dataset.y)
@@ -74,11 +83,11 @@ class DraggableComponent extends BaseComponent {
     const isVLocked = JSON.parse(this.dataset.isVLocked)
 
     if (!isHLocked || !isVLocked) {
-      this.classList.add("has-grab-cursor")
+      this.inner.classList.add("has-grab-cursor")
     }
 
     this.updateComputedStyle(true)
-    this.off("mount", this.onMount)
+    this.removeEventListener("mount", this.onMount)
   }
 
   onMouseDown(event) {
@@ -98,7 +107,7 @@ class DraggableComponent extends BaseComponent {
     }
 
     this.dataset.isBeingDragged = true
-    this.classList.add("is-being-dragged")
+    this.inner.classList.add("is-being-dragged")
 
     this.dispatchEvent(
       new CustomEvent("drag-start", { detail: this.getBoundingClientRect() }),
@@ -149,7 +158,7 @@ class DraggableComponent extends BaseComponent {
 
     const wasBeingDragged = JSON.parse(this.dataset.isBeingDragged)
     this.dataset.isBeingDragged = false
-    this.classList.remove("is-being-dragged")
+    this.inner.classList.remove("is-being-dragged")
 
     if (wasBeingDragged) {
       this.dispatchEvent(
@@ -160,7 +169,7 @@ class DraggableComponent extends BaseComponent {
     return this
   }
 
-  onPositionAttributeChange() {
+  onPositionChange() {
     this.x_ = parseFloat(this.dataset.x)
     this.y_ = parseFloat(this.dataset.y)
     this.updateComputedStyle()
@@ -168,11 +177,11 @@ class DraggableComponent extends BaseComponent {
 
   updateComputedStyle(shouldForceUpdate) {
     if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
-      this.style.left = this.x_ + "px"
+      this.inner.style.left = this.x_ + "px"
     }
 
     if (shouldForceUpdate || !JSON.parse(this.dataset.isVLocked)) {
-      this.style.top = this.y_ + "px"
+      this.inner.style.top = this.y_ + "px"
     }
   }
 }
