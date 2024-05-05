@@ -22,267 +22,177 @@
         }
         return out;
       }
-      module.exports = { getAllElements };
+      function pascalToKebab(x) {
+        let out = "";
+        x.split("").forEach((char) => {
+          const lowerChar = char.toLowerCase();
+          if (char !== lowerChar && out.length > 0) {
+            out += "-";
+          }
+          out += lowerChar;
+        });
+        return out;
+      }
+      module.exports = { getAllElements, pascalToKebab };
     }
   });
 
   // src/base.js
   var require_base = __commonJS({
     "src/base.js"(exports, module) {
-      var { getAllElements } = require_utils();
-      Object.defineProperty(Node.prototype, "localShadowRoot", {
-        configurable: true,
-        enumerable: true,
-        get() {
-          if (this instanceof ShadowRoot) {
-            return this;
-          }
-          if (this.shadowRoot) {
-            return this.shadowRoot;
-          }
-          let temp = this;
-          while (temp.parentNode) {
-            if (temp.parentNode instanceof ShadowRoot) {
-              return temp.parentNode;
-            }
-            if (temp.parentNode.shadowRoot) {
-              return temp.parentNode.shadowRoot;
-            }
-            temp = temp.parentNode;
-          }
-          return void 0;
-        },
-        set() {
-          throw new Error("The `localShadowRoot` property is read-only!");
-        }
-      });
-      var BaseComponent = class extends HTMLElement {
+      var { getAllElements, pascalToKebab } = require_utils();
+      var BaseComponent = class {
+        static baseElement = "div";
+        static classRegistry = [];
+        static css = ``;
         static template = `
-    <template>
-      <div class="x-base">
-        <slot></slot>
-      </div>
-    </template>
+    <slot></slot>
   `;
-        mutationObservers = [];
-        constructor() {
-          super();
-          const parser = new DOMParser();
-          const fragment = parser.parseFromString(
-            this.constructor.template,
-            "text/html"
-          );
-          const shadow = this.attachShadow({ mode: "open" });
-          shadow.appendChild(
-            fragment.querySelector("template").content.cloneNode(true)
-          );
+        static get className() {
+          return "x-" + pascalToKebab(this.name).replace(/-component$/g, "");
         }
-        addAttributeChangeListener(attributeName, callback) {
-          return this.addEventListener("attribute-change:" + attributeName, callback);
+        static register() {
+          this.classRegistry.push(this);
         }
-        connectedCallback() {
-          if (super.connectedCallback) {
-            super.connectedCallback();
+        constructor(data) {
+          data = data || {};
+          if (data.el) {
+            if (typeof data.el === "string") {
+              this.el = document.querySelector(data.el);
+            } else if (data.el instanceof HTMLElement) {
+              this.el = data.el;
+            } else {
+              throw new Error(
+                `When passing an options object with an "el" property into the \`${this.constructor.name}\` constructor, the "el" value must be a string or an \`HTMLElement\`!`
+              );
+            }
+          } else {
+            this.el = document.createElement(this.constructor.baseElement);
           }
-          const attributeObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (mutation.attributeName) {
-                this.dispatchEvent(new CustomEvent("attribute-change"));
-                this.dispatchEvent(
-                  new CustomEvent("attribute-change:" + mutation.attributeName)
+          this.el.classList.add(this.constructor.className);
+          const injectedHtml = this.el.innerHTML;
+          this.el.innerHTML = this.constructor.template;
+          if (injectedHtml.length > 0) {
+            const injectedHtmlIncludesSlottedContent = injectedHtml.match(/<.*?slot=".*?".*?/g);
+            const slots = Array.from(this.el.querySelectorAll("slot"));
+            if (slots.length === 0) {
+              throw new Error(
+                `A(n) \`${this.constructor.name}\` component received slotted content, but its template contains no slots in which to place the content!`
+              );
+            }
+            const parser = new DOMParser();
+            const fragment = parser.parseFromString(injectedHtml, "text/html");
+            const els = Array.from(fragment.head.children).concat(
+              Array.from(fragment.body.children)
+            );
+            if (els.length === 0) {
+              const span = document.createElement("span");
+              span.innerHTML = injectedHtml;
+              els.push(span);
+            }
+            if (injectedHtmlIncludesSlottedContent) {
+              els.forEach((el) => {
+                const slotName = el.getAttribute("slot");
+                const slot = slots.find(
+                  (slot2) => slot2.getAttribute("name") === slotName
+                );
+                if (!slot) {
+                  throw new Error(
+                    `A \`${this.constructor.name}\` component received slotted content for a slot named "${slotName}", but the component's template contains no such slot!`
+                  );
+                }
+                slot.parentElement.replaceChild(el, slot);
+              });
+            } else {
+              let foundAnUnnamedSlot = false;
+              slots.forEach((slot) => {
+                if (!slot.getAttribute("name")) {
+                  foundAnUnnamedSlot = true;
+                  const parent = slot.parentElement;
+                  parent.replaceChild(els.at(-1), slot);
+                  for (let i = els.length - 2; i >= 0; i--) {
+                    parent.insertBefore(els[i], els[i + 1]);
+                  }
+                }
+              });
+              if (!foundAnUnnamedSlot) {
+                throw new Error(
+                  `A \`${this.constructor.name}\` component received slotted content for an unnamed slot, but its template has no unnamed slots!`
                 );
               }
-            });
-          });
-          attributeObserver.observe(this, { attributes: true });
-          this.mutationObservers.push(attributeObserver);
-          this.dispatchEvent(new CustomEvent("mount"));
-          return this;
-        }
-        disconnectedCallback() {
-          if (super.disconnectedCallback) {
-            super.disconnectedCallback();
+            }
           }
-          this.mutationObservers.forEach((observer) => observer.disconnect());
-          this.dispatchEvent(new CustomEvent("unmount"));
+          if (this.el.parentElement) {
+            this.emit("mount");
+          }
+        }
+        emit(name, payload) {
+          this.el.dispatchEvent(new CustomEvent(name, { detail: payload }));
           return this;
         }
-        querySelector() {
-          return getAllElements(this).find((el) => el.matches(...arguments));
+        mount(parent) {
+          parent.appendChild(this.el);
+          this.emit("mount");
+          return this;
         }
-        querySelectorAll() {
-          return getAllElements(this).filter((el) => el.matches(...arguments));
+        off(name, callback) {
+          this.el.removeEventListener(name, callback);
+          return this;
         }
-        removeAttributeChangeListener(attributeName, callback) {
-          return this.removeEventListener(
-            "attribute-change:" + attributeName,
-            callback
-          );
+        on(name, callback) {
+          const remover = () => {
+            this.el.removeEventListener(name, callback);
+            this.el.removeEventListener("unmount", remover);
+          };
+          this.el.addEventListener("unmount", remover);
+          this.el.addEventListener(name, callback);
+          return remover;
+        }
+        unmount() {
+          if (this.el.parentElement) {
+            this.el.parentElement.removeChild(this.el);
+          }
+          this.emit("unmount");
+          return this;
         }
       };
-      customElements.define("x-base", BaseComponent);
+      function findAndLoadComponents(elements) {
+        elements.forEach((el) => {
+          try {
+            const compName = el.getAttribute("component");
+            if (compName) {
+              const Component = BaseComponent.classRegistry.find(
+                (Component2) => Component2.className === compName
+              );
+              if (Component) {
+                new Component({ el });
+              }
+            }
+          } catch (e) {
+          }
+        });
+      }
+      var observer = new MutationObserver((mutations) => {
+        const els = [];
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList") {
+            els.push(...Array.from(mutation.addedNodes));
+          }
+        });
+        findAndLoadComponents(els);
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      window.addEventListener("load", () => {
+        findAndLoadComponents(getAllElements(document.body));
+      });
+      BaseComponent.register();
       module.exports = BaseComponent;
     }
   });
 
   // src/draggable.js
   var require_draggable = __commonJS({
-    "src/draggable.js"(exports, module) {
-      var BaseComponent = require_base();
-      var DraggableComponent = class extends BaseComponent {
-        static template = (
-          /* html */
-          `
-    <template>
-      <style>
-        .x-draggable {
-          position: absolute;
-          left: 0;
-          top: 0;
-        }
-
-        .x-draggable.has-grab-cursor {
-          cursor: grab;
-        }
-
-        .x-draggable.is-being-dragged {
-          cursor: grabbing;
-        }
-
-        .x-draggable.is-being-dragged,
-        .x-draggable.is-being-dragged * {
-          user-select: none;
-        }
-      </style>
-
-      <div class="x-draggable">
-        <slot></slot>
-      </div>
-    </template>
-  `
-        );
-        x_ = 0;
-        y_ = 0;
-        constructor(data) {
-          data = data || {};
-          super(data);
-          this.inner = this.querySelector(".x-draggable");
-          this.dataset.isBeingDragged = false;
-          this.dataset.isHLocked = false;
-          this.dataset.isVLocked = false;
-          this.dataset.mouseX = 0;
-          this.dataset.mouseY = 0;
-          this.dataset.x = 0;
-          this.dataset.y = 0;
-          this.addEventListener("mount", this.onMount);
-        }
-        onLockStatusChange() {
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (!isHLocked || !isVLocked) {
-            this.inner.classList.add("has-grab-cursor");
-          } else {
-            this.inner.classList.remove("has-grab-cursor");
-          }
-        }
-        onMount() {
-          const boundOnLockStatusChange = this.onLockStatusChange.bind(this);
-          const boundOnMouseDown = this.onMouseDown.bind(this);
-          const boundOnMouseMove = this.onMouseMove.bind(this);
-          const boundOnMouseUp = this.onMouseUp.bind(this);
-          const boundOnPositionChange = this.onPositionChange.bind(this);
-          this.addEventListener("mousedown", boundOnMouseDown);
-          window.addEventListener("mousemove", boundOnMouseMove);
-          window.addEventListener("mouseup", boundOnMouseUp);
-          this.addAttributeChangeListener("data-is-h-locked", boundOnLockStatusChange);
-          this.addAttributeChangeListener("data-is-v-locked", boundOnLockStatusChange);
-          this.addAttributeChangeListener("data-x", boundOnPositionChange);
-          this.addAttributeChangeListener("data-y", boundOnPositionChange);
-          this.x_ = parseFloat(this.dataset.x);
-          this.y_ = parseFloat(this.dataset.y);
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (!isHLocked || !isVLocked) {
-            this.inner.classList.add("has-grab-cursor");
-          }
-          this.updateComputedStyle(true);
-          this.removeEventListener("mount", this.onMount);
-        }
-        onMouseDown(event) {
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (isHLocked && isVLocked) {
-            return;
-          }
-          if (!isHLocked) {
-            this.dataset.mouseX = event.screenX;
-          }
-          if (!isVLocked) {
-            this.dataset.mouseY = event.screenY;
-          }
-          this.dataset.isBeingDragged = true;
-          this.inner.classList.add("is-being-dragged");
-          this.dispatchEvent(
-            new CustomEvent("drag-start", { detail: this.getBoundingClientRect() })
-          );
-          return this;
-        }
-        onMouseMove(event) {
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (isHLocked && isVLocked) {
-            return;
-          }
-          if (JSON.parse(this.dataset.isBeingDragged)) {
-            const dx = event.screenX - parseFloat(this.dataset.mouseX);
-            const dy = event.screenY - parseFloat(this.dataset.mouseY);
-            if (!isHLocked) {
-              this.x_ += dx;
-              this.dataset.mouseX = event.screenX;
-            }
-            if (!isVLocked) {
-              this.y_ += dy;
-              this.dataset.mouseY = event.screenY;
-            }
-            this.updateComputedStyle();
-            this.dispatchEvent(
-              new CustomEvent("drag", { detail: this.getBoundingClientRect() })
-            );
-          }
-          return this;
-        }
-        onMouseUp() {
-          const isHLocked = JSON.parse(this.dataset.isHLocked);
-          const isVLocked = JSON.parse(this.dataset.isVLocked);
-          if (isHLocked && isVLocked) {
-            return;
-          }
-          const wasBeingDragged = JSON.parse(this.dataset.isBeingDragged);
-          this.dataset.isBeingDragged = false;
-          this.inner.classList.remove("is-being-dragged");
-          if (wasBeingDragged) {
-            this.dispatchEvent(
-              new CustomEvent("drag-end", { detail: this.getBoundingClientRect() })
-            );
-          }
-          return this;
-        }
-        onPositionChange() {
-          this.x_ = parseFloat(this.dataset.x);
-          this.y_ = parseFloat(this.dataset.y);
-          this.updateComputedStyle();
-        }
-        updateComputedStyle(shouldForceUpdate) {
-          if (shouldForceUpdate || !JSON.parse(this.dataset.isHLocked)) {
-            this.inner.style.left = this.x_ + "px";
-          }
-          if (shouldForceUpdate || !JSON.parse(this.dataset.isVLocked)) {
-            this.inner.style.top = this.y_ + "px";
-          }
-        }
-      };
-      customElements.define("x-draggable", DraggableComponent);
-      module.exports = DraggableComponent;
+    "src/draggable.js"() {
     }
   });
 
